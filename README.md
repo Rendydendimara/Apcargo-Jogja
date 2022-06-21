@@ -23,3 +23,24 @@ url: {host}/{parameter} - host = host - parameter = id data
 - jika pemanggilan url dengan parameter, maka lakukan pemanggilan ke api apakah data sudah ada atau tidak
 - 2 tipe array, array statis (yang diatas) & array dinamis (yang dinamis)
 - heigth data fix, kalau berlebihan akan overflow
+
+v.2.0
+UPDATE :
+
+- Customer ID = select2
+- QTY = input angka
+- Percentage = input angka
+- value added tax = radio button
+
+Data Tabel:
+
+- setiap ganti Customer ID, akan bertambah tabel baru atas nama Customer ID
+- jika ganti ke Customer ID yang sudah ada, maka dia akan update(tambah data)
+- setiap tabel ada tombol hapus untuk menghapus tabel
+- setiap action pada tabel sama seperti yang ada
+
+https://mui.com/components/tables
+
+- Ketika semua data sudah terisi baru bisa input.
+- 1 user bisa memiliki banyak row (entry data)
+- design tabel selling disamakan dengan yang ada di PDF. column tax & invoice hanya untuk row paling akhir

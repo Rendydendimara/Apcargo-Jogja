@@ -1,10 +1,8 @@
-import { Input } from '@chakra-ui/input';
-import { Box, Flex, Text } from '@chakra-ui/layout';
+import { Box, Flex } from '@chakra-ui/layout';
 import { Modal, ModalContent, ModalOverlay } from '@chakra-ui/modal';
 import { Spinner } from '@chakra-ui/spinner';
-import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/table';
 import React, { useEffect, useState } from 'react';
-import Select, { ActionMeta, OnChangeValue, StylesConfig } from 'react-select';
+import { ActionMeta, OnChangeValue } from 'react-select';
 import {
   IAppHeaderForm,
   IDataBuying,
@@ -18,16 +16,26 @@ import {
 import { useToast } from '@chakra-ui/react';
 import { Button } from '@chakra-ui/button';
 import axios from 'axios';
-import TdTabelDetail from './components/molecules/TdTabelDetail';
 import findIndex from 'lodash/findIndex';
-
+import AppHeader from './components/molecules/AppHeader';
+import FormBuying from './components/molecules/FormBuying';
+import FormSelling from './components/molecules/FormSelling';
+import DataTabelBuying from './components/molecules/DataTabelBuying';
+import DataTabelSelling from './components/molecules/DataTabelSelling';
+import groupBy from 'lodash/groupBy';
+import uniqBy from 'lodash/uniqBy';
+import {
+  getCurrency,
+  getPrice,
+  getTotalIDR,
+  getTotalUSD,
+  getGrandTotal,
+  getTax,
+} from './utils/selling';
 export interface IDataItem {
   label: string;
   data: any;
 }
-const CONFIG_FETCH = {
-  headers: { 'Access-Control-Allow-Origin': '*' },
-};
 
 export const convertUSDFormat = (
   num: number,
@@ -57,38 +65,45 @@ export const convertUSDFormat = (
   }
 };
 
-const colourStyles: StylesConfig<any> = {
-  control: (provided) => ({
-    ...provided,
-    background: '#fff',
-    minHeight: '30px',
-    height: '30px',
-  }),
+const DummyCustomerID: ISelectJobSheetID[] = [
+  {
+    value: '1',
+    label: 'Daniel Roy',
+  },
+  {
+    value: '2',
+    label: 'Rendy',
+  },
+  {
+    value: '3',
+    label: 'John Doe',
+  },
+];
 
-  valueContainer: (provided) => ({
-    ...provided,
-    height: '30px',
-    padding: '0 6px',
-  }),
-
-  input: (provided) => ({
-    ...provided,
-    margin: '0px',
-  }),
-  indicatorSeparator: () => ({
-    display: 'none',
-  }),
-  indicatorsContainer: (provided) => ({
-    ...provided,
-    height: '30px',
-  }),
-};
+const DUMMY_SELLING: IDataSeling[] = [
+  {
+    id: 1,
+    fixIsiJobsheetID: {
+      label: 'Label',
+      value: '23',
+    },
+    nominalDipakai1IDR2USD: '2',
+    nominal: '30',
+    kurs: '10',
+    nominalDollar: '100',
+    customerID: DummyCustomerID[0],
+    qty: 2,
+    percentage: 10,
+    valueAddedTax: 'yes',
+  },
+];
 
 function App() {
   const toast = useToast();
   const [listSelectJobSheetID, setListSelectJobSheetID] = useState<
     ISelectJobSheetID[]
   >([]);
+  const [listCustomerID, setListCustomerID] = useState<ISelectJobSheetID[]>([]);
   const [dataTabelDetailBuying, setDataTabelDetailBuying] = useState<
     IDataTabelBuying[]
   >([]);
@@ -124,6 +139,10 @@ function App() {
     nominal: '',
     kurs: '',
     nominalDollar: '',
+    customerID: null,
+    qty: 0,
+    percentage: 0,
+    valueAddedTax: 'no',
   });
   const [idEditFormBuying, setIdEditFormBuying] = useState<number | null>(null);
   const [idEditFormSelling, setIdEditFormSelling] =
@@ -135,11 +154,8 @@ function App() {
   const [listContainer, setListContainer] = useState<any[]>([]);
 
   const getDataJobsheetID = async () => {
-    // const response = await ApiGetDataJobsheetID();
-
     const response = await axios.get(
-      '/api/apcargo/public/admin/getJSbuyingSelling',
-      CONFIG_FETCH
+      'https://panellokasee.host/apcargo/public/admin/getJSbuyingSelling'
     );
 
     if (response.status === 200) {
@@ -166,6 +182,13 @@ function App() {
     });
   };
 
+  const handleChangeValueAddedTaxSelling = (value: string) => {
+    setDataSellingForm({
+      ...dataSellingForm,
+      valueAddedTax: value,
+    });
+  };
+
   const handleChangeJobSheetIDSelling = (
     newValue: OnChangeValue<ISelectJobSheetID, false>,
     actionMeta: ActionMeta<any>
@@ -176,6 +199,45 @@ function App() {
     });
   };
 
+  const handleChangeCustomerIDSelling = (
+    newValue: OnChangeValue<ISelectJobSheetID, false>,
+    actionMeta: ActionMeta<any>
+  ) => {
+    setDataSellingForm({
+      ...dataSellingForm,
+      customerID: newValue,
+    });
+
+    // const indexCustomer = findIndex(listDataSelling, [
+    //   'customerID.value',
+    //   newValue?.value,
+    // ]);
+    // if (indexCustomer === -1) {
+    //   // Add new customer data
+    //   const temp = [
+    //     ...listDataSelling,
+    //     {
+    //       id: new Date().getTime(),
+    //       fixIsiJobsheetID: null,
+    //       nominalDipakai1IDR2USD: '',
+    //       nominal: '',
+    //       kurs: '',
+    //       nominalDollar: '',
+    //       customerID: newValue,
+    //       qty: 0,
+    //       percentage: 0,
+    //       valueAddedTax: 'no',
+    //     },
+    //   ].sort((a, b) => {
+    //     if (a.id > b.id) return -1;
+    //     if (a.id < b.id) return 1;
+    //     return 0;
+    //   });
+    //   setListDataSelling(temp);
+    // } else {
+    //   // Update new customer data
+    // }
+  };
   const handleChangeDataAppHeaderForm = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -202,6 +264,7 @@ function App() {
     const re = /^([0-9]|[^,$\w])*$/;
     let num = event.target.value; // .replaceAll(',', '');
     if (event.target.value === '' || re.test(num)) {
+      // only input number
       let temp = {
         ...dataBuyingForm,
         [event.target.name]: num,
@@ -366,6 +429,7 @@ function App() {
     }
     handleClearFormData('buying');
   };
+
   const handleAddUpdateListDataSelling = () => {
     if (idEditFormSelling) {
       if (isEditExitsAktifSell) {
@@ -383,6 +447,10 @@ function App() {
             nominal: dataSellingForm.nominal,
             kurs: dataSellingForm.kurs,
             nominaldolar: dataSellingForm.nominalDollar,
+            customerID: dataSellingForm.customerID,
+            qty: dataSellingForm.qty,
+            percentage: dataSellingForm.percentage,
+            valueAddedTax: dataSellingForm.valueAddedTax,
           },
           ...dataAktifSell.slice(indexData + 1, dataAktifSell.length),
         ]);
@@ -398,6 +466,10 @@ function App() {
             nominal: dataSellingForm.nominal,
             kurs: dataSellingForm.kurs,
             nominalDollar: dataSellingForm.nominalDollar,
+            customerID: dataSellingForm.customerID,
+            qty: dataSellingForm.qty,
+            percentage: dataSellingForm.percentage,
+            valueAddedTax: dataSellingForm.valueAddedTax,
           },
           ...listDataSelling.slice(indexData + 1, listDataSelling.length),
         ]);
@@ -412,6 +484,11 @@ function App() {
         isClosable: true,
       });
     } else {
+      // const indexCustomer = findIndex(listDataSelling, [
+      //   'customerID.value',
+      //   dataSellingForm.customerID?.value,
+      // ]);
+      // if (indexCustomer === -1) {
       const temp = [
         ...listDataSelling,
         {
@@ -421,6 +498,10 @@ function App() {
           nominal: dataSellingForm.nominal,
           kurs: dataSellingForm.kurs,
           nominalDollar: dataSellingForm.nominalDollar,
+          customerID: dataSellingForm.customerID,
+          qty: dataSellingForm.qty,
+          percentage: dataSellingForm.percentage,
+          valueAddedTax: dataSellingForm.valueAddedTax,
         },
       ].sort((a, b) => {
         if (a.id > b.id) return -1;
@@ -436,6 +517,32 @@ function App() {
         position: 'bottom-right',
         isClosable: true,
       });
+      // } else {
+      //   setListDataSelling([
+      //     ...listDataSelling.slice(0, indexCustomer),
+      //     {
+      //       id: listDataSelling[indexCustomer].id,
+      //       fixIsiJobsheetID: dataSellingForm.fixIsiJobsheetID,
+      //       nominalDipakai1IDR2USD: dataSellingForm.nominalDipakai1IDR2USD,
+      //       nominal: dataSellingForm.nominal,
+      //       kurs: dataSellingForm.kurs,
+      //       nominalDollar: dataSellingForm.nominalDollar,
+      //       customerID: dataSellingForm.customerID,
+      //       qty: dataSellingForm.qty,
+      //       percentage: dataSellingForm.percentage,
+      //       valueAddedTax: dataSellingForm.valueAddedTax,
+      //     },
+      //     ...listDataSelling.slice(indexCustomer + 1, listDataSelling.length),
+      //   ]);
+      //   toast({
+      //     title: 'Success',
+      //     description: 'success update data selling.',
+      //     status: 'success',
+      //     position: 'bottom-right',
+      //     duration: 5000,
+      //     isClosable: true,
+      //   });
+      // }
     }
     handleClearFormData('selling');
   };
@@ -456,6 +563,10 @@ function App() {
         nominal: '',
         kurs: '',
         nominalDollar: '',
+        customerID: null,
+        qty: 0,
+        percentage: 0,
+        valueAddedTax: 'no',
       });
     }
     if (isEditExitsAktifBuy) {
@@ -495,6 +606,7 @@ function App() {
     let selectedData = dataAktifBuy.filter(
       (data: any) => Number(data.id) === id
     );
+    console.log('id', id);
 
     if (selectedData.length > 0) {
       let fixIsiJobsheetID = listSelectJobSheetID.filter(
@@ -541,11 +653,17 @@ function App() {
         nominal: selectedData[0].nominal,
         kurs: selectedData[0].kurs,
         nominalDollar: selectedData[0].nominalDollar,
+        customerID: selectedData[0].customerID,
+        qty: selectedData[0].qty,
+        percentage: selectedData[0].percentage,
+        valueAddedTax: selectedData[0].valueAddedTax,
       });
     }
   };
 
   const handleEditDataAktifSell = (id: number) => {
+    console.log('dataAktifSell', dataAktifSell);
+    console.log('id', id);
     let selectedData = dataAktifSell.filter(
       (data: any) => Number(data.id) === id
     );
@@ -564,6 +682,10 @@ function App() {
         nominal: selectedData[0].nominal,
         kurs: selectedData[0].kurs,
         nominalDollar: selectedData[0].nominaldolar,
+        customerID: selectedData[0].customerID,
+        qty: selectedData[0].qty,
+        percentage: selectedData[0].percentage,
+        valueAddedTax: selectedData[0].valueAddedTax,
       });
     }
   };
@@ -582,16 +704,15 @@ function App() {
 
   const getDataPanel = async (id: string) => {
     const response = await axios.get(
-      `/api/apcargo/public/admin/getJSData/${id}`,
-      CONFIG_FETCH
+      `https://panellokasee.host/apcargo/public/admin/getJSData/${id}`
     );
-
+    console.log('response', response);
     if (response.status === 200) {
       let dataPasif: any[] = [];
       const dataAktifSell: any[] = [];
       const pasif = response.data.hasil.pasif;
       const aktif = response.data.hasil.aktif;
-      let tempData: any[] = [];
+      let tempCustomer: ISelectJobSheetID[] = [];
       let tempBuy: any = [];
       let tempSell: any = [];
       aktif.buy.forEach((data: any) => {
@@ -610,17 +731,26 @@ function App() {
       setTitle(aktif.tableatas.kodeshipment);
       setLokasiStuffing(aktif.tableatas.lokasistuffing);
       setListContainer(response.data.hasil.container);
+      response.data.hasil.customer.forEach((customer: any) => {
+        tempCustomer.push({
+          label: customer.joinname,
+          value: customer.id,
+        });
+      });
+      setListCustomerID(tempCustomer);
       aktif.sell.forEach((data: any) => {
-        let fixIsiJobsheetID = listSelectJobSheetID.filter(
-          (job: ISelectJobSheetID) => job.value === data.fix_isijobsheet_id
-        );
-        if (fixIsiJobsheetID.length > 0) {
-          tempSell.push({
-            ...data,
-            fix_isijobsheet_id: fixIsiJobsheetID[0],
-          });
-        } else {
-          tempSell.push(data);
+        if (data.id !== null) {
+          let fixIsiJobsheetID = listSelectJobSheetID.filter(
+            (job: ISelectJobSheetID) => job.value === data.fix_isijobsheet_id
+          );
+          if (fixIsiJobsheetID.length > 0) {
+            tempSell.push({
+              ...data,
+              fix_isijobsheet_id: fixIsiJobsheetID[0],
+            });
+          } else {
+            tempSell.push(data);
+          }
         }
       });
       setDataAktifBuy(tempBuy);
@@ -673,6 +803,7 @@ function App() {
     setIsLoadingFetchPost(true);
     let dataBuying: any[] = [];
     let dataSelling: any[] = [];
+    let dataSellingAktif: any[] = [];
     listDataBuying.forEach((data: IDataBuying) => {
       dataBuying.push({
         nominaldipakai: data.nominalDipakai1IDR2USD,
@@ -682,15 +813,109 @@ function App() {
         biayalapangan: data.fixIsiJobsheetID?.value ?? null,
       });
     });
-    listDataSelling.forEach((data: IDataSeling) => {
-      dataSelling.push({
-        nominaldipakai: data.nominalDipakai1IDR2USD,
-        nominal: data.nominal,
-        kurs: data.kurs,
-        nominaldolar: data.nominalDollar,
-        biayalapangan: data.fixIsiJobsheetID?.value ?? null,
+    const sellingGroups: any = groupBy(listDataSelling, 'customerID.value');
+    const countCustomer = uniqBy(listDataSelling, 'customerID');
+    let costomerSellingGroups: any = [];
+    let customerSelling: any[] = [];
+    countCustomer.map((customer: any) => {
+      costomerSellingGroups.push(sellingGroups[customer.customerID.value]);
+    });
+    costomerSellingGroups.forEach((customerSellings: IDataSeling[]) => {
+      let tempSelling: any = [];
+      let total3A: number = 0;
+      let total3B: number = 0;
+      let total3C: number = 0;
+      customerSellings.forEach((selling: IDataSeling) => {
+        let currency = getCurrency(selling.nominalDipakai1IDR2USD);
+        let price = getPrice(
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        let totalIDR = getTotalIDR(
+          selling.qty,
+          selling.percentage,
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        let totalUSD = getTotalUSD(
+          selling.qty,
+          selling.percentage,
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        let grandTotal = getGrandTotal(
+          selling.kurs,
+          selling.qty,
+          selling.percentage,
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        let tax = getTax(
+          selling.valueAddedTax,
+          selling.kurs,
+          selling.qty,
+          selling.percentage,
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        total3A = total3A + grandTotal;
+        total3B = total3B + tax;
+        total3C = total3C + total3A + total3B;
+
+        tempSelling.push({
+          nominaldipakai: selling.nominalDipakai1IDR2USD,
+          nominal: selling.nominal,
+          kurs: selling.kurs,
+          nominaldolar: selling.nominalDollar,
+          biayalapangan: selling.fixIsiJobsheetID?.value ?? null,
+          qty: selling.qty,
+          percentage: selling.percentage,
+          valueAddedTax: selling.valueAddedTax,
+          currency: currency,
+          price: price,
+          totalIDR: totalIDR,
+          totalUSD: totalUSD,
+          grandTotal: grandTotal,
+          tax: tax,
+        });
+      });
+      customerSelling.push({
+        customerId: customerSellings[0].customerID,
+        data3A: total3A,
+        taxTotal: total3B,
+        total: total3C,
+        dataSellings: tempSelling,
       });
     });
+
+    // listDataSelling.forEach((data: IDataSeling) => {
+    //   dataSelling.push({
+    //     nominaldipakai: data.nominalDipakai1IDR2USD,
+    //     nominal: data.nominal,
+    //     kurs: data.kurs,
+    //     nominaldolar: data.nominalDollar,
+    //     biayalapangan: data.fixIsiJobsheetID?.value ?? null,
+    //     customerID: data.customerID,
+    //     qty: data.qty,
+    //     percentage: data.percentage,
+    //     valueAddedTax: data.valueAddedTax,
+    //     // customerID
+    //     // qty
+    //     // percentage
+    //     // valueAddedTax
+    //     // currency
+    //     // price
+    //     // totalIDR
+    //     // totalUSD
+    //     // grandTotal
+    //     // tax
+    //   });
+    // });
     dataAktifBuy.forEach((data: any) => {
       dataBuying.push({
         nominaldipakai: data.nominaldipakai,
@@ -703,7 +928,7 @@ function App() {
       });
     });
     dataAktifSell.forEach((data: any) => {
-      dataSelling.push({
+      dataSellingAktif.push({
         nominaldipakai: data.nominaldipakai,
         nominal: data.nominal,
         kurs: data.kurs,
@@ -724,12 +949,13 @@ function App() {
           emkl: dataAppHeaderForm.emkl ?? 0,
         },
         buying: dataBuying,
-        selling: dataSelling,
+        selling: customerSelling,
+        sellingAktif: dataSellingAktif,
       },
     };
     console.log('data', data);
     axios
-      .post('/api/apcargo/public/postDataJS', data, CONFIG_FETCH)
+      .post('https://panellokasee.host/apcargo/public/postDataJS1', data)
       .then((res: any) => {
         setIsLoadingFetchPost(false);
         toast({
@@ -754,176 +980,47 @@ function App() {
         console.log('err', err);
       });
   };
+  const handleDeleteDataCustomer = (customerId: string) => {
+    let updated = listDataSelling.filter(
+      (selling: IDataSeling) =>
+        String(selling.customerID?.value ?? '0') !== String(customerId)
+    );
+    setListDataSelling(updated);
+  };
+
+  // useEffect(() => {
+  //   getDataJobsheetID();
+  //   const paramArr = window.location.href.split('/');
+  //   const paramsId = paramArr[paramArr.length - 1];
+  //   if (paramsId) {
+  //     getDataPanel(paramsId);
+  //   }
+  // }, []);
 
   useEffect(() => {
     getDataJobsheetID();
-    const paramArr = window.location.href.split('/');
-    const paramsId = paramArr[paramArr.length - 1];
-    if (paramsId) {
-      getDataPanel(paramsId);
+    if (document.location) {
+      let loc: any = document.location;
+      let params: any = new URL(loc).searchParams;
+      let paramsId: any = params.get('id');
+      // const paramArr = window.location.href.split('/');
+      // const paramsId = paramArr[paramArr.length - 1];
+      if (paramsId) {
+        getDataPanel(paramsId);
+      }
     }
   }, []);
-
   return (
-    <Box p='20px'>
+    <Box p='20px 40px'>
       <Box w='full' mt='20px'>
         {/* Header App */}
-        <Box w='full' mb='25px'>
-          <Box w='full'>
-            <Text fontSize='24px' fontWeight='bold' color='#000000'>
-              {title}
-            </Text>
-            {title && (
-              <Text mr='15px' fontSize='20px' fontWeight='bold' color='#000000'>
-                Lokasi Stuffing: {lokasiStuffing ? `${lokasiStuffing}` : 'null'}
-              </Text>
-            )}
-            {listContainer.map((container: any, index: number) => (
-              <Flex alignItems='center'>
-                <Text
-                  mr='15px'
-                  fontSize='20px'
-                  fontWeight='bold'
-                  color='#000000'
-                >
-                  No Container: {container?.kodecontainer ?? 'null'}
-                </Text>
-                <Text
-                  mr='15px'
-                  fontSize='20px'
-                  fontWeight='bold'
-                  color='#000000'
-                >
-                  No Seal: {container?.noseal ?? 'null'}
-                </Text>
-                <Text
-                  mr='15px'
-                  fontSize='20px'
-                  fontWeight='bold'
-                  color='#000000'
-                >
-                  Capacity: {container?.nama ?? 'null'}
-                </Text>
-                <Text
-                  mr='15px'
-                  fontSize='20px'
-                  fontWeight='bold'
-                  color='#000000'
-                >
-                  Notes: {container?.notes ?? 'null'}
-                </Text>
-              </Flex>
-            ))}
-            {dataAppHeaderForm.mjid && (
-              <a
-                href={`https://panellokasee.host/apcargo/public/admin/fix_mainjobsheet/lihatjobsheet/${dataAppHeaderForm.mjid}`}
-                rel='noreferrer'
-                target='_blank'
-              >
-                <Button
-                  width='150px'
-                  height='35px'
-                  bgColor='blue.300'
-                  color='white'
-                  mb='25px'
-                  mt='20px'
-                >
-                  Lihat hasil
-                </Button>
-              </a>
-            )}
-            <Box
-              w={{
-                base: '100%',
-                sm: '100%',
-                md: '50%',
-                xl: '50%',
-              }}
-            >
-              <Table size='sm'>
-                <Tbody>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      EMKL
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='emkl'
-                        value={dataAppHeaderForm.emkl}
-                        onChange={handleChangeDataAppHeaderForm}
-                        height='30px'
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Rate Pajak
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='ratePajak'
-                        // value={convertUSDFormat(
-                        //   Number(dataAppHeaderForm.ratePajak),
-                        //   'IDR'
-                        // )}
-                        value={dataAppHeaderForm.ratePajak}
-                        onChange={handleChangeDataAppHeaderForm}
-                        height='30px'
-                        type='string'
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Rate Bonus
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='rateBonus'
-                        // value={convertUSDFormat(
-                        //   Number(dataAppHeaderForm.rateBonus),
-                        //   'IDR'
-                        // )}
-                        value={dataAppHeaderForm.rateBonus}
-                        onChange={handleChangeDataAppHeaderForm}
-                        height='30px'
-                        type='string'
-                      />
-                    </Td>
-                  </Tr>
-                  {/* <Tr>
-                  <Td borderStyle='none' px='0px' py='4px'>
-                    MJID
-                  </Td>
-                  <Td borderStyle='none' px='0px' py='4px'>
-                    <Input
-                      name='mjid'
-                      value={dataAppHeaderForm.mjid}
-                      onChange={handleChangeDataAppHeaderForm}
-                      height='30px'
-                      type='number'
-                    />
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td borderStyle='none' px='0px' py='4px'>
-                    SID
-                  </Td>
-                  <Td borderStyle='none' px='0px' py='4px'>
-                    <Input
-                      name='sid'
-                      value={dataAppHeaderForm.sid}
-                      onChange={handleChangeDataAppHeaderForm}
-                      height='30px'
-                      type='number'
-                    />
-                  </Td>
-                </Tr> */}
-                </Tbody>
-              </Table>
-            </Box>
-          </Box>
-        </Box>
+        <AppHeader
+          title={title}
+          lokasiStuffing={lokasiStuffing}
+          listContainer={listContainer}
+          dataAppHeaderForm={dataAppHeaderForm}
+          handleChangeDataAppHeaderForm={handleChangeDataAppHeaderForm}
+        />
         {/* Form App */}
         <Box w='full'>
           <Flex
@@ -936,256 +1033,36 @@ function App() {
             }}
           >
             {/* Form Buying */}
-            <Box
-              w={{
-                base: '100%',
-                sm: '100%',
-                md: '50%',
-                xl: '50%',
-              }}
-            >
-              <Text bgColor='gray.400' fontWeight='bold' fontSize='14px'>
-                Buying
-              </Text>
-              <Table size='sm'>
-                <Tbody>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Fix Isi Jobsheet ID
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px' height='30px'>
-                      <Select
-                        options={listSelectJobSheetID}
-                        onChange={handleChangeJobSheetIDBuying}
-                        placeholder='Select jobsheet id'
-                        styles={colourStyles}
-                        value={dataBuyingForm.fixIsiJobsheetID}
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Nominal Dipakai 1 IDR 2 USD
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='nominalDipakai1IDR2USD'
-                        onChange={handleChangeDataFormBuying}
-                        height='30px'
-                        // value={convertUSDFormat(
-                        //   Number(dataBuyingForm.nominalDipakai1IDR2USD),
-                        //   'IDR'
-                        // )}
-                        value={dataBuyingForm.nominalDipakai1IDR2USD}
-                        type='string'
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Nominal
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='nominal'
-                        onChange={handleChangeDataFormBuying}
-                        height='30px'
-                        // value={convertUSDFormat(
-                        //   Number(dataBuyingForm.nominal),
-                        //   'IDR'
-                        // )}
-                        value={dataBuyingForm.nominal}
-                        type='string'
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Kurs
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='kurs'
-                        onChange={handleChangeDataFormBuying}
-                        height='30px'
-                        // value={convertUSDFormat(
-                        //   Number(dataBuyingForm.kurs),
-                        //   'IDR'
-                        // )}
-                        value={dataBuyingForm.kurs}
-                        type='string'
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Nominal Dollar
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='nominalDollar'
-                        onChange={handleChangeDataFormBuying}
-                        height='30px'
-                        // value={convertUSDFormat(
-                        //   Number(dataBuyingForm.nominalDollar),
-                        //   'NominalDollar'
-                        // )}
-                        value={dataBuyingForm.nominalDollar}
-                        // value={dataBuyingForm.nominalDollar}
-                        type='text'
-                      />
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-              <Flex justifyContent='center' w='full' mt='10px' gridGap='15px'>
-                <Button
-                  width='150px'
-                  height='35px'
-                  bgColor='green.300'
-                  color='white'
-                  onClick={handleAddUpdateListDataBuying}
-                >
-                  {idEditFormBuying ? 'Update' : 'Add'}
-                </Button>
-                <Button
-                  width='150px'
-                  height='35px'
-                  bgColor='yellow.300'
-                  color='white'
-                  onClick={() => handleClearFormData('buying')}
-                >
-                  Cancel
-                </Button>
-              </Flex>
-            </Box>
+            <FormBuying
+              listSelectJobSheetID={listSelectJobSheetID}
+              dataBuyingForm={dataBuyingForm}
+              idEditFormBuying={idEditFormBuying}
+              handleClearFormData={handleClearFormData}
+              handleChangeDataFormBuying={handleChangeDataFormBuying}
+              handleAddUpdateListDataBuying={handleAddUpdateListDataBuying}
+              handleChangeJobSheetIDBuying={handleChangeJobSheetIDBuying}
+            />
             {/* Form Seling */}
-            <Box
-              w={{
-                base: '100%',
-                sm: '100%',
-                md: '50%',
-                xl: '50%',
-              }}
-            >
-              <Text bgColor='gray.400' fontWeight='bold' fontSize='14px'>
-                Selling
-              </Text>
-              <Table size='sm'>
-                <Tbody>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Fix Isi Jobsheet ID
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px' height='30px'>
-                      <Select
-                        options={listSelectJobSheetID}
-                        onChange={handleChangeJobSheetIDSelling}
-                        placeholder='Select jobsheet id'
-                        styles={colourStyles}
-                        value={dataSellingForm.fixIsiJobsheetID}
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Nominal Dipakai 1 IDR 2 USD
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='nominalDipakai1IDR2USD'
-                        onChange={handleChangeDataFormSelling}
-                        height='30px'
-                        // value={convertUSDFormat(
-                        //   Number(dataSellingForm.nominalDipakai1IDR2USD),
-                        //   'IDR'
-                        // )}
-                        value={dataSellingForm.nominalDipakai1IDR2USD}
-                        type='string'
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Nominal
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='nominal'
-                        onChange={handleChangeDataFormSelling}
-                        height='30px'
-                        // value={convertUSDFormat(
-                        //   Number(dataSellingForm.nominal),
-                        //   'IDR'
-                        // )}
-                        value={dataSellingForm.nominal}
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Kurs
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='kurs'
-                        onChange={handleChangeDataFormSelling}
-                        height='30px'
-                        // value={convertUSDFormat(
-                        //   Number(dataSellingForm.kurs),
-                        //   'IDR'
-                        // )}
-                        value={dataSellingForm.kurs}
-                        type='string'
-                      />
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      Nominal Dollar
-                    </Td>
-                    <Td borderStyle='none' px='0px' py='4px'>
-                      <Input
-                        name='nominalDollar'
-                        // value={convertUSDFormat(
-                        //   Number(dataSellingForm.nominalDollar),
-                        //   'NominalDollar'
-                        // )}
-                        value={dataSellingForm.nominalDollar}
-                        onChange={handleChangeDataFormSelling}
-                        type='text'
-                        height='30px'
-                      />
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-              <Flex justifyContent='center' w='full' mt='10px' gridGap='15px'>
-                <Button
-                  width='150px'
-                  height='35px'
-                  bgColor='green.300'
-                  color='white'
-                  onClick={handleAddUpdateListDataSelling}
-                >
-                  {idEditFormSelling ? 'Update' : 'Add'}
-                </Button>
-                <Button
-                  width='150px'
-                  height='35px'
-                  bgColor='yellow.300'
-                  color='white'
-                  onClick={() => handleClearFormData('selling')}
-                >
-                  Cancel
-                </Button>
-              </Flex>
-            </Box>
+            <FormSelling
+              listSelectJobSheetID={listSelectJobSheetID}
+              listCustomerID={listCustomerID}
+              handleChangeValueAddedTaxSelling={
+                handleChangeValueAddedTaxSelling
+              }
+              dataSellingForm={dataSellingForm}
+              idEditFormSelling={idEditFormSelling}
+              handleChangeDataFormSelling={handleChangeDataFormSelling}
+              handleAddUpdateListDataSelling={handleAddUpdateListDataSelling}
+              handleClearFormData={handleClearFormData}
+              handleChangeJobSheetIDSelling={handleChangeJobSheetIDSelling}
+              handleChangeCustomerIDSelling={handleChangeCustomerIDSelling}
+            />
           </Flex>
         </Box>
         {/* Tabel Detail */}
         <Box w='full' mt='10px'>
           <Flex
+            w='full'
             gridGap='3'
             flexDirection={{
               base: 'column',
@@ -1193,8 +1070,8 @@ function App() {
               md: 'row',
               xl: 'row',
             }}
+            justifyContent='space-between'
           >
-            {/* Tabel detail buying */}
             <Box
               w={{
                 base: '100%',
@@ -1202,193 +1079,20 @@ function App() {
                 md: '50%',
                 xl: '50%',
               }}
-              borderWidth='2px'
-              borderColor='gray.400'
-              height='auto'
             >
-              <Text>Tabel Detail</Text>
-              <Box w='full' h='500px' maxH='500px' overflowY='scroll'>
-                <Table size='sm'>
-                  <Thead px='4px' bgColor='gray.200'>
-                    <Tr>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                      >
-                        Fix Isi Jobsheet ID
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                        w='100px'
-                      >
-                        Nominal Dipakai 1 IDR 2 USD
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                      >
-                        Nominal
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                      >
-                        Kurs
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                        w='80px'
-                      >
-                        Nominal Dollar
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                      >
-                        Action
-                      </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {/* name data tabel akan diambil dari data select Fix Isi Jobsheet ID */}
-                    {listDataBuying.map(
-                      (dataBuying: IDataBuying, index: number) => (
-                        <TdTabelDetail
-                          haveAction={true}
-                          name={dataBuying.fixIsiJobsheetID?.label ?? ''}
-                          total={String(dataBuying.nominalDipakai1IDR2USD)}
-                          nominal={String(dataBuying.nominal)}
-                          kurs={String(dataBuying.kurs)}
-                          nominalDolar={String(dataBuying.nominalDollar)}
-                          key={index}
-                          onEdit={handleEditDataBuying}
-                          onDelete={handleDeleteDataBuying}
-                          id={dataBuying.id}
-                        />
-                      )
-                    )}
-                    {dataAktifBuy.map((data: any, index: number) => (
-                      <TdTabelDetail
-                        haveAction={true}
-                        name={
-                          data.fix_isijobsheet_id?.label ??
-                          getBiayaLapangName(data.fix_isijobsheet_id)
-                        }
-                        total={data.nominaldipakai}
-                        nominal={data.nominal}
-                        kurs={data.kurs}
-                        nominalDolar={data.nominaldolar}
-                        key={index}
-                        onEdit={handleEditDataAktifBuy}
-                        onDelete={handleDeleteDataAktifBuy}
-                        id={data.id}
-                      />
-                    ))}
-                    {dataTabelDetailBuying.map(
-                      (data: IDataTabelBuying, index: number) => (
-                        <>
-                          <Text
-                            mt='10px'
-                            fontSize='13px'
-                            borderStyle='none'
-                            px='0px'
-                            fontWeight='bold'
-                            ml='4px'
-                            textTransform='capitalize'
-                            key={index}
-                          >
-                            {data.label}
-                          </Text>
-                          {/* {data.data.map((dt: any) => {
-                            return dt.map((d: IDataValue, index3: number) => (
-                              <TdTabelDetail
-                                name={String(d.label)}
-                                total={String(d.value)}
-                                nominal='0'
-                                kurs='0'
-                                key={index3}
-                              />
-                            ));
-                          })} */}
-                          {data.data.map((dt: any, index: number) => {
-                            return (
-                              <RenderDetailTabelBuying key={index} data={dt} />
-                            );
-                          })}
-                        </>
-                      )
-                    )}
-                    {dataTabelBuyingHumico.map((data: any, index: number) => (
-                      <>
-                        <Text
-                          mt='10px'
-                          fontSize='13px'
-                          borderStyle='none'
-                          px='0px'
-                          fontWeight='bold'
-                          ml='4px'
-                          textTransform='capitalize'
-                          key={index}
-                        >
-                          {data.label}
-                        </Text>
-                        {data.data.map((dt: any, index2: number) => {
-                          return (
-                            <>
-                              <TdTabelDetail
-                                name={dt[0].label ?? ''}
-                                total={dt[0].value ?? 0}
-                                key={index2}
-                                isHumico={true}
-                              />
-                              <TdTabelDetail
-                                name={dt[1].label ?? ''}
-                                total={dt[1].value ?? 0}
-                                key={index2}
-                                isHumico={true}
-                              />
-                            </>
-                          );
-                          // return dt.map((d: any, index3: number) => (
-                          //   <TdTabelDetail
-                          //     name={d.label ?? ''}
-                          //     total={dt.value ?? 'null'}
-                          //   />
-                          // ));
-                        })}
-                      </>
-                    ))}
-                  </Tbody>
-                </Table>
-              </Box>
+              {/* Tabel detail buying */}
+              <DataTabelBuying
+                listDataBuying={listDataBuying}
+                dataAktifBuy={dataAktifBuy}
+                dataTabelDetailBuying={dataTabelDetailBuying}
+                dataTabelBuyingHumico={dataTabelBuyingHumico}
+                handleEditDataBuying={handleEditDataBuying}
+                handleDeleteDataBuying={handleDeleteDataBuying}
+                getBiayaLapangName={getBiayaLapangName}
+                handleEditDataAktifBuy={handleEditDataAktifBuy}
+                handleDeleteDataAktifBuy={handleDeleteDataAktifBuy}
+              />
             </Box>
-            {/* Tabel detail seling */}
             <Box
               w={{
                 base: '100%',
@@ -1396,151 +1100,19 @@ function App() {
                 md: '50%',
                 xl: '50%',
               }}
-              borderWidth='2px'
-              borderColor='gray.400'
-              height='auto'
             >
-              <Text>Tabel Detail</Text>
-              <Box w='full' h='500px' maxH='500px' overflowY='scroll'>
-                <Table size='sm'>
-                  <Thead px='4px' bgColor='gray.200'>
-                    <Tr>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                      >
-                        Fix Isi Jobsheet ID
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                        w='100px'
-                      >
-                        Nominal Dipakai 1 IDR 2 USD
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                      >
-                        Nominal
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                      >
-                        Kurs
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                        w='80px'
-                      >
-                        Nominal Dollar
-                      </Th>
-                      <Th
-                        borderStyle='none'
-                        px='0px'
-                        py='4px'
-                        fontSize='11px'
-                        textTransform='capitalize'
-                        textAlign='center'
-                      >
-                        Action
-                      </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {/* name data tabel akan diambil dari data select Fix Isi Jobsheet ID */}
-                    {listDataSelling.map(
-                      (dataSeling: IDataSeling, index: number) => (
-                        <TdTabelDetail
-                          name={dataSeling.fixIsiJobsheetID?.label ?? ''}
-                          total={String(dataSeling.nominalDipakai1IDR2USD)}
-                          nominal={String(dataSeling.nominal)}
-                          kurs={String(dataSeling.kurs)}
-                          nominalDolar={String(dataSeling.nominalDollar)}
-                          key={index}
-                          onEdit={handleEditDataSelling}
-                          onDelete={handleDeleteDataSelling}
-                          id={dataSeling.id}
-                          haveAction={true}
-                        />
-                      )
-                    )}
-                    {dataAktifSell.map((data: any, index: number) => (
-                      <TdTabelDetail
-                        haveAction={true}
-                        name={
-                          data.fix_isijobsheet_id?.label ??
-                          getBiayaLapangName(data.fix_isijobsheet_id)
-                        }
-                        total={data.nominaldipakai}
-                        nominal={data.nominal}
-                        kurs={data.kurs}
-                        nominalDolar={data.nominaldolar}
-                        key={index}
-                        onEdit={handleEditDataAktifSell}
-                        onDelete={handleDeleteDataAktifSell}
-                        id={data.id}
-                      />
-                    ))}
-                    {dataTabelDetailSelling.map(
-                      (data: IDataTabelBuying, index: number) => (
-                        <>
-                          <Text
-                            mt='10px'
-                            fontSize='13px'
-                            borderStyle='none'
-                            px='0px'
-                            fontWeight='bold'
-                            ml='4px'
-                            textTransform='capitalize'
-                            key={index}
-                          >
-                            {data.label}
-                          </Text>
-                          {/* {data.data.map((dt: any) => {
-        return dt.map((d: IDataValue, index3: number) => (
-          <TdTabelDetail
-            name={String(d.label)}
-            total={String(d.value)}
-            nominal='0'
-            kurs='0'
-            key={index3}
-          />
-        ));
-      })} */}
-                          {data.data.map((dt: any, index: number) => {
-                            return (
-                              <RenderDetailTabelBuying data={dt} key={index} />
-                            );
-                          })}
-                        </>
-                      )
-                    )}
-                  </Tbody>
-                </Table>
-              </Box>
+              {/* Tabel detail seling */}
+              <DataTabelSelling
+                listDataSelling={listDataSelling}
+                dataAktifSell={dataAktifSell}
+                dataTabelDetailSelling={dataTabelDetailSelling}
+                handleEditDataSelling={handleEditDataSelling}
+                handleDeleteDataSelling={handleDeleteDataSelling}
+                getBiayaLapangName={getBiayaLapangName}
+                handleEditDataAktifSell={handleEditDataAktifSell}
+                handleDeleteDataAktifSell={handleDeleteDataAktifSell}
+                handleDeleteDataCustomer={handleDeleteDataCustomer}
+              />
             </Box>
           </Flex>
         </Box>
@@ -1587,25 +1159,3 @@ function App() {
 }
 
 export default App;
-
-interface IPropsRender {
-  data: any;
-}
-const RenderDetailTabelBuying: React.FC<IPropsRender> = (props) => {
-  const selectName = props.data.filter((dt: any) => dt.label === 'nama');
-  const selectTotal = props.data.filter((dt: any) => dt.label === 'dolar');
-  const selectNominal = props.data.filter((dt: any) => dt.label === 'nominal');
-  const selectKurs = props.data.filter((dt: any) => dt.label === 'kurs');
-  const selectNominalDolar = props.data.filter(
-    (dt: any) => dt.label === 'nominalkredit'
-  );
-  return (
-    <TdTabelDetail
-      name={selectName[0]?.value ?? ''}
-      total={selectTotal[0]?.value ?? ''}
-      nominal={selectNominal[0]?.value ?? ''}
-      kurs={selectKurs[0]?.value ?? ''}
-      nominalDolar={selectNominalDolar[0]?.value ?? ''}
-    />
-  );
-};

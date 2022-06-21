@@ -23,6 +23,10 @@ export interface IFormSelling {
   nominal: string;
   kurs: string;
   nominalDollar: string;
+  customerID: ISelectJobSheetID | null;
+  qty: number;
+  percentage: number;
+  valueAddedTax: string;
 }
 
 export interface IDataBuying extends IFormBuying {

@@ -265,7 +265,7 @@ function App() {
     let num = event.target.value; // .replaceAll(',', '');
     if (event.target.value === '' || re.test(num)) {
       // only input number
-      let temp = {
+      let temp: any = {
         ...dataBuyingForm,
         [event.target.name]: num,
       };
@@ -297,6 +297,14 @@ function App() {
               nominal == Infinity ? 0 : isNaN(nominal) ? 0 : nominal
             ),
           };
+          setDataBuyingForm(temp);
+        } else if (event.target.name === 'nominalDipakai1IDR2USD') {
+          if (Number(num) > 2) {
+            temp = {
+              ...temp,
+              [event.target.name]: '',
+            };
+          }
           setDataBuyingForm(temp);
         } else {
           setDataBuyingForm({
@@ -345,6 +353,14 @@ function App() {
               nominal == Infinity ? 0 : isNaN(nominal) ? 0 : nominal
             ),
           };
+          setDataSellingForm(temp);
+        } else if (event.target.name === 'nominalDipakai1IDR2USD') {
+          if (Number(num) > 2) {
+            temp = {
+              ...temp,
+              [event.target.name]: '',
+            };
+          }
           setDataSellingForm(temp);
         } else {
           setDataSellingForm({
@@ -955,7 +971,7 @@ function App() {
     };
     console.log('data', data);
     axios
-      .post('https://panellokasee.host/apcargo/public/postDataJS1', data)
+      .post('https://panellokasee.host/apcargo/public/postDataJS', data)
       .then((res: any) => {
         setIsLoadingFetchPost(false);
         toast({

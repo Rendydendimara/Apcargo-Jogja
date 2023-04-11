@@ -83,7 +83,8 @@ const FormBuying: React.FC<IProps> = (props) => {
             onChange={props.handleChangeDataFormBuying}
             height='40px'
             value={props.dataBuyingForm.nominalDipakai1IDR2USD}
-            type='string'
+            type='number'
+            max={2}
           />
         </Box>
         <Box w='full' marginBottom='20px'>

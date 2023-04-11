@@ -91,7 +91,7 @@ const AppHeader: React.FC<IProps> = (props) => {
               fontWeight='600'
               color='#8C8C8C'
             >
-              JOGJA ( Joglo ) + JEPARA ( Bu Uun )
+              {props.lokasiStuffing}
             </Text>
           </Flex>
         </Flex>

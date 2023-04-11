@@ -169,9 +169,9 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                           dataSeling.nominal,
                           dataSeling.nominalDollar
                         );
-                        total3A = total3A + grandTotal;
-                        total3B = total3B + tax;
-                        total3C = total3C + total3A + total3B;
+                        total3A = grandTotal;
+                        total3B = tax;
+                        total3C = total3A + total3B;
                         return (
                           <TdTabelDetail
                             haveAction={true}

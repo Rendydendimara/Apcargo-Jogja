@@ -1,3 +1,5 @@
+import { PERCENT_TAX } from '../constant';
+
 export const getCurrency = (total: string | undefined): string => {
   const type = total ?? '';
   if (type === '1') {
@@ -109,7 +111,7 @@ export const getTax = (
   );
 
   if (valueAddedTax === 'yes') {
-    return grandTotal * 0.01;
+    return grandTotal * PERCENT_TAX;
   } else if (valueAddedTax === 'no') {
     return 0;
   } else {

@@ -833,11 +833,11 @@ function App() {
     const countCustomer = uniqBy(listDataSelling, 'customerID');
     let costomerSellingGroups: any = [];
     let customerSelling: any[] = [];
+    let tempSelling: any = [];
     countCustomer.map((customer: any) => {
       costomerSellingGroups.push(sellingGroups[customer.customerID.value]);
     });
     costomerSellingGroups.forEach((customerSellings: IDataSeling[]) => {
-      let tempSelling: any = [];
       let total3A: number = 0;
       let total3B: number = 0;
       let total3C: number = 0;
@@ -965,7 +965,7 @@ function App() {
           emkl: dataAppHeaderForm.emkl ?? 0,
         },
         buying: dataBuying,
-        selling: customerSelling,
+        selling: tempSelling,
         sellingAktif: dataSellingAktif,
       },
     };

@@ -119,7 +119,7 @@ const DataTabelBuying: React.FC<IProps> = (props) => {
                   </>
                 )
               )}
-              {props.dataTabelBuyingHumico.map((data: any, index: number) => (
+              {/* {props.dataTabelBuyingHumico.map((data: any, index: number) => (
                 <>
                   <Text
                     mt='10px'
@@ -152,7 +152,7 @@ const DataTabelBuying: React.FC<IProps> = (props) => {
                     );
                   })}
                 </>
-              ))}
+              ))} */}
             </TableBody>
           </Table>
         </Box>

@@ -44,12 +44,13 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
   useEffect(() => {
     const sellingGroups: any = groupBy(
       props.listDataSelling,
-      'customerID.value'
+      'jid' // 'customerID.value'
     );
-    const countCustomer = uniqBy(props.listDataSelling, 'customerID');
+    const countCustomer = uniqBy(props.listDataSelling, 'jid'); // 'customerID');
     let temp: any = [];
     countCustomer.map((customer: any) => {
-      temp.push(sellingGroups[customer.customerID.value]);
+      // temp.push(sellingGroups[customer.customerID.value]);
+      temp.push(sellingGroups[customer.jid]);
     });
     setListDataSellingGroup(temp);
   }, [props.listDataSelling]);
@@ -79,8 +80,17 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                 overflowY='scroll'
                 padding='10px'
               >
-                <Text fontSize='18px' fontWeight='bold' my='10px'>
+                {/* <Text fontSize='18px' fontWeight='bold' my='10px'>
                   {listDataSeling[0].customerID?.label}
+                </Text> */}
+                <Text
+                  fontSize='18px'
+                  color='red'
+                  fontStyle='italic'
+                  fontWeight='bold'
+                  my='10px'
+                >
+                  Customer Info Sedang Dalam Bermasalah
                 </Text>
                 <Table
                   sx={{ minWidth: 750 }}
@@ -175,7 +185,9 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                         return (
                           <TdTabelDetail
                             haveAction={true}
-                            name={dataSeling.fixIsiJobsheetID?.label ?? ''}
+                            name={
+                              dataSeling.fixIsiJobsheetID?.label ?? 'NAMEEE'
+                            }
                             total={String(dataSeling.nominalDipakai1IDR2USD)}
                             nominal={String(dataSeling.nominal)}
                             kurs={String(dataSeling.kurs)}
@@ -271,6 +283,7 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
         }
       )}
       <Box
+        display='none'
         w='full'
         borderWidth='2px'
         borderColor='gray.400'

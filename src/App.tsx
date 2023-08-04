@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/layout';
+import { Box, Flex, Text } from '@chakra-ui/layout';
 import { Modal, ModalContent, ModalOverlay } from '@chakra-ui/modal';
 import { Spinner } from '@chakra-ui/spinner';
 import React, { useEffect, useState } from 'react';
@@ -13,7 +13,16 @@ import {
   ISelectJobSheetID,
   IDataValue,
 } from './interface';
-import { useToast } from '@chakra-ui/react';
+import {
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  useToast,
+} from '@chakra-ui/react';
 import { Button } from '@chakra-ui/button';
 import axios from 'axios';
 import findIndex from 'lodash/findIndex';
@@ -152,14 +161,15 @@ function App() {
   const [isEditExitsAktifSell, setIsEditExitsAktifSell] =
     useState<boolean>(false);
   const [listContainer, setListContainer] = useState<any[]>([]);
+  const [loadingGetJobsheet, setLoadingGetJobsheet] = useState(false);
 
   const getDataJobsheetID = async () => {
     const response = await axios.get(
       'https://panellokasee.host/apcargo/public/admin/getJSbuyingSelling'
     );
+    let temp: ISelectJobSheetID[] = [];
 
     if (response.status === 200) {
-      let temp: ISelectJobSheetID[] = [];
       if (response.data.hasOwnProperty('hasil')) {
         response.data.hasil.forEach((jobSheet: any) => {
           temp.push({
@@ -170,6 +180,7 @@ function App() {
         setListSelectJobSheetID(temp);
       }
     }
+    return temp;
   };
 
   const handleChangeJobSheetIDBuying = (
@@ -447,6 +458,8 @@ function App() {
   };
 
   const handleAddUpdateListDataSelling = () => {
+    // console.log('dataSellingForm', dataSellingForm);
+
     if (idEditFormSelling) {
       if (isEditExitsAktifSell) {
         const indexData = findIndex(dataAktifSell, [
@@ -622,7 +635,7 @@ function App() {
     let selectedData = dataAktifBuy.filter(
       (data: any) => Number(data.id) === id
     );
-    console.log('id', id);
+    // console.log('id', id);
 
     if (selectedData.length > 0) {
       let fixIsiJobsheetID = listSelectJobSheetID.filter(
@@ -678,8 +691,8 @@ function App() {
   };
 
   const handleEditDataAktifSell = (id: number) => {
-    console.log('dataAktifSell', dataAktifSell);
-    console.log('id', id);
+    // console.log('dataAktifSell', dataAktifSell);
+    // console.log('id', id);
     let selectedData = dataAktifSell.filter(
       (data: any) => Number(data.id) === id
     );
@@ -719,10 +732,10 @@ function App() {
   };
 
   const getDataPanel = async (id: string) => {
+    setLoadingGetJobsheet(true);
     const response = await axios.get(
       `https://panellokasee.host/apcargo/public/admin/getJSData/${id}`
     );
-    console.log('response', response);
     if (response.status === 200) {
       let dataPasif: any[] = [];
       const dataAktifSell: any[] = [];
@@ -770,7 +783,7 @@ function App() {
         }
       });
       setDataAktifBuy(tempBuy);
-      setDataAktifSell(tempSell);
+      // setDataAktifSell(tempSell);
 
       for (let key in pasif) {
         let tempData: any[] = [];
@@ -801,7 +814,43 @@ function App() {
         ratePajak: aktif.tableatas.rate_pajak ?? '',
         rateBonus: aktif.tableatas.rate_bonus ?? '',
       });
+
+      // set tabel selling
+      // setListDataSelling] = useState<IDataSeling[]
+      const getCustomerName = (id: any) => {
+        // console.log('listCustomerID', listCustomerID);
+        const selected = tempCustomer.filter(
+          (cstmr: any) => cstmr.value === id
+        )[0];
+        return selected ? selected : null;
+      };
+      const listJobSheet = await getDataJobsheetID();
+      const getJobSheet = (id: any) => {
+        // console.log('listCustomerID', listCustomerID);
+        const selected = listJobSheet.filter(
+          (cstmr: any) => cstmr.value === id
+        )[0];
+        return selected ? selected : null;
+      };
+
+      let tempListDataSelling: any[] = [];
+      aktif.sell.forEach((data: any) => {
+        tempListDataSelling.push({
+          id: data.id,
+          fixIsiJobsheetID: getJobSheet(data.fix_isijobsheet_id),
+          nominalDipakai1IDR2USD: data.nominaldipakai,
+          nominal: data.nominal,
+          kurs: data.kurs,
+          nominalDollar: data.nominaldolar,
+          customerID: getCustomerName(data.customer_id),
+          qty: data.qty ? data.qty : 0,
+          percentage: data.percentage ? data.percentage : 0,
+          valueAddedTax: data.valueaddedtax ? data.valueaddedtax : 'no',
+        });
+      });
+      setListDataSelling(tempListDataSelling);
     }
+    setLoadingGetJobsheet(false);
   };
 
   const getBiayaLapangName = (id: string): string => {
@@ -882,7 +931,6 @@ function App() {
         total3A = total3A + grandTotal;
         total3B = total3B + tax;
         total3C = total3C + total3A + total3B;
-
         tempSelling.push({
           nominaldipakai: selling.nominalDipakai1IDR2USD,
           nominal: selling.nominal,
@@ -969,7 +1017,6 @@ function App() {
         sellingAktif: dataSellingAktif,
       },
     };
-    console.log('data', data);
     axios
       .post('https://panellokasee.host/apcargo/public/postDataJS', data)
       .then((res: any) => {
@@ -996,6 +1043,194 @@ function App() {
         console.log('err', err);
       });
   };
+
+  /**
+   * With
+   * customerID and fixIsiJobsheetID */
+  const handlePostDataNewTest = (e: any) => {
+    e.preventDefault();
+    setIsLoadingFetchPost(true);
+    let dataBuying: any[] = [];
+    let dataSelling: any[] = [];
+    let dataSellingAktif: any[] = [];
+    listDataBuying.forEach((data: IDataBuying) => {
+      dataBuying.push({
+        nominaldipakai: data.nominalDipakai1IDR2USD,
+        nominal: data.nominal,
+        kurs: data.kurs,
+        nominaldolar: data.nominalDollar,
+        biayalapangan: data.fixIsiJobsheetID?.value ?? null,
+      });
+    });
+    const sellingGroups: any = groupBy(listDataSelling, 'customerID.value');
+    const countCustomer = uniqBy(listDataSelling, 'customerID');
+    let costomerSellingGroups: any = [];
+    let customerSelling: any[] = [];
+    let tempSelling: any = [];
+    countCustomer.map((customer: any) => {
+      costomerSellingGroups.push(sellingGroups[customer.customerID.value]);
+    });
+    costomerSellingGroups.forEach((customerSellings: IDataSeling[]) => {
+      let total3A: number = 0;
+      let total3B: number = 0;
+      let total3C: number = 0;
+      customerSellings.forEach((selling: IDataSeling) => {
+        let currency = getCurrency(selling.nominalDipakai1IDR2USD);
+        let price = getPrice(
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        let totalIDR = getTotalIDR(
+          selling.qty,
+          selling.percentage,
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        let totalUSD = getTotalUSD(
+          selling.qty,
+          selling.percentage,
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        let grandTotal = getGrandTotal(
+          selling.kurs,
+          selling.qty,
+          selling.percentage,
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        let tax = getTax(
+          selling.valueAddedTax,
+          selling.kurs,
+          selling.qty,
+          selling.percentage,
+          selling.nominalDipakai1IDR2USD,
+          selling.nominal,
+          selling.nominalDollar
+        );
+        total3A = total3A + grandTotal;
+        total3B = total3B + tax;
+        total3C = total3C + total3A + total3B;
+        tempSelling.push({
+          nominaldipakai: selling.nominalDipakai1IDR2USD,
+          nominal: selling.nominal,
+          kurs: selling.kurs,
+          nominaldolar: selling.nominalDollar,
+          biayalapangan: selling.fixIsiJobsheetID?.value ?? null,
+          qty: selling.qty,
+          percentage: selling.percentage,
+          valueAddedTax: selling.valueAddedTax,
+          currency: currency,
+          price: price,
+          totalIDR: totalIDR,
+          totalUSD: totalUSD,
+          grandTotal: grandTotal,
+          tax: tax,
+          customerID: selling.customerID?.value ?? null,
+          fixIsiJobsheetID: selling.fixIsiJobsheetID?.value ?? null,
+        });
+      });
+      customerSelling.push({
+        customerId: customerSellings[0].customerID,
+        data3A: total3A,
+        taxTotal: total3B,
+        total: total3C,
+        dataSellings: tempSelling,
+      });
+    });
+
+    // listDataSelling.forEach((data: IDataSeling) => {
+    //   dataSelling.push({
+    //     nominaldipakai: data.nominalDipakai1IDR2USD,
+    //     nominal: data.nominal,
+    //     kurs: data.kurs,
+    //     nominaldolar: data.nominalDollar,
+    //     biayalapangan: data.fixIsiJobsheetID?.value ?? null,
+    //     customerID: data.customerID,
+    //     qty: data.qty,
+    //     percentage: data.percentage,
+    //     valueAddedTax: data.valueAddedTax,
+    //     // customerID
+    //     // qty
+    //     // percentage
+    //     // valueAddedTax
+    //     // currency
+    //     // price
+    //     // totalIDR
+    //     // totalUSD
+    //     // grandTotal
+    //     // tax
+    //   });
+    // });
+    dataAktifBuy.forEach((data: any) => {
+      dataBuying.push({
+        nominaldipakai: data.nominaldipakai,
+        nominal: data.nominal,
+        kurs: data.kurs,
+        nominaldolar: data.nominaldolar,
+        biayalapangan:
+          data.fix_isijobsheet_id?.value ?? data.fix_isijobsheet_id,
+        jid: data.jid,
+      });
+    });
+    dataAktifSell.forEach((data: any) => {
+      dataSellingAktif.push({
+        nominaldipakai: data.nominaldipakai,
+        nominal: data.nominal,
+        kurs: data.kurs,
+        nominaldolar: data.nominaldolar,
+        biayalapangan:
+          data.fix_isijobsheet_id?.value ?? data.fix_isijobsheet_id,
+        jid: data.jid,
+      });
+    });
+
+    const data = {
+      jobsheet: {
+        mjid: dataAppHeaderForm.mjid ?? 0,
+        sid: dataAppHeaderForm.sid ?? 0,
+        js: {
+          rate_pajak: dataAppHeaderForm.ratePajak ?? 0,
+          bonus: dataAppHeaderForm.rateBonus ?? 0,
+          emkl: dataAppHeaderForm.emkl ?? 0,
+        },
+        buying: dataBuying,
+        selling: tempSelling,
+        sellingAktif: dataSellingAktif,
+      },
+    };
+    // console.log('data', data);
+    axios
+      .post('https://panellokasee.host/apcargo/public/postDataJS', data)
+      .then((res: any) => {
+        setIsLoadingFetchPost(false);
+        toast({
+          title: 'Success',
+          description: 'Success post data.',
+          status: 'success',
+          position: 'bottom-right',
+          duration: 5000,
+          isClosable: true,
+        });
+      })
+      .catch((err: any) => {
+        setIsLoadingFetchPost(false);
+        toast({
+          title: 'Failed',
+          description: 'Pailed post data.',
+          status: 'error',
+          position: 'bottom-right',
+          duration: 5000,
+          isClosable: true,
+        });
+        console.log('err', err);
+      });
+  };
+
   const handleDeleteDataCustomer = (customerId: string) => {
     let updated = listDataSelling.filter(
       (selling: IDataSeling) =>
@@ -1015,6 +1250,7 @@ function App() {
 
   useEffect(() => {
     getDataJobsheetID();
+    // setTimeout(() => {
     if (document.location) {
       let loc: any = document.location;
       let params: any = new URL(loc).searchParams;
@@ -1025,12 +1261,14 @@ function App() {
         getDataPanel(paramsId);
       }
     }
+    // }, 1000);
   }, []);
   return (
     <Box p='20px 40px'>
       <Box w='full' mt='20px'>
         {/* Header App */}
         <AppHeader
+          loadingGetJobsheet={loadingGetJobsheet}
           title={title}
           lokasiStuffing={lokasiStuffing}
           listContainer={listContainer}
@@ -1128,13 +1366,21 @@ function App() {
                 handleEditDataAktifSell={handleEditDataAktifSell}
                 handleDeleteDataAktifSell={handleDeleteDataAktifSell}
                 handleDeleteDataCustomer={handleDeleteDataCustomer}
+                // listCustomerID={listCustomerID}
               />
             </Box>
           </Flex>
         </Box>
         {/* Footer App */}
-        <Flex w='full' my='25px' justifyContent='center'>
-          <Button
+        <Flex
+          w='full'
+          my='25px'
+          flexDirection='column'
+          gridGap='10px'
+          alignItems='center'
+          justifyContent='center'
+        >
+          {/* <Button
             bgColor='green.300'
             color='white'
             w={320}
@@ -1145,7 +1391,33 @@ function App() {
             _focus={{}}
           >
             POST API
+          </Button> */}
+          {/* <Popover trigger={'hover'} placement='top'>
+            <PopoverTrigger> */}
+          <Button
+            bgColor='green.300'
+            color='white'
+            w={320}
+            onClick={handlePostDataNewTest}
+            type='submit'
+            isLoading={isLoadingFetchPost}
+            _hover={{}}
+            _focus={{}}
+            // isDisabled={true}
+          >
+            POST API
           </Button>
+          {/* </PopoverTrigger>
+            <PopoverContent> */}
+          {/* <PopoverArrow />
+              <PopoverCloseButton />
+              <PopoverHeader>Confirmation!</PopoverHeader>
+              <PopoverBody>
+                Sisitem sedang dalam perbaikan error customer. Tidak bisa
+                melakukan post data.
+              </PopoverBody>
+            </PopoverContent>
+          </Popover> */}
         </Flex>
       </Box>
       <Modal
@@ -1170,6 +1442,9 @@ function App() {
           />
         </ModalContent>
       </Modal>
+      <Text mt='100px' textAlign='center' color='gray.600' fontSize='sm'>
+        Version 4823
+      </Text>
     </Box>
   );
 }

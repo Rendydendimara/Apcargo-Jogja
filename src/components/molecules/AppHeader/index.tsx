@@ -1,11 +1,15 @@
 import { Button } from '@chakra-ui/button';
 import { Input } from '@chakra-ui/input';
-import { Box, Flex, Text } from '@chakra-ui/layout';
+import { Box, Flex, Link, Text } from '@chakra-ui/layout';
 import { Table, Tbody, Td, Tr } from '@chakra-ui/table';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IAppHeaderForm } from '../../../interface';
 import ShipIcon from '../../../icons/ship.svg';
-import { Icon } from '@chakra-ui/react';
+import { Icon, Skeleton } from '@chakra-ui/react';
+import {
+  convertPriceStringToNumber,
+  toFormatPrice,
+} from '../../../utils/currency';
 // import { ReactComponent as ListIcon } from '../../../icons/ship.svg';
 
 interface IProps {
@@ -14,52 +18,74 @@ interface IProps {
   listContainer: any[];
   dataAppHeaderForm: IAppHeaderForm;
   handleChangeDataAppHeaderForm: (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: any //React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  loadingGetJobsheet: boolean;
 }
 
 const AppHeader: React.FC<IProps> = (props) => {
+  const [idParams, setIdParams] = useState('');
+
+  useEffect(() => {
+    if (document.location) {
+      let loc: any = document.location;
+      let params: any = new URL(loc).searchParams;
+      let paramsId: any = params.get('id');
+      // const paramArr = window.location.href.split('/');
+      // const paramsId = paramArr[paramArr.length - 1];
+      setIdParams(paramsId);
+    }
+  }, []);
+
   return (
     <Box w='full' mb='25px'>
       <Box w='full'>
         <Flex w='full' alignItems='center' justifyContent='space-between'>
-          {props.listContainer.map((container: any, index: number) => (
-            <Flex alignItems='center' key={index} gridGap='15px' w='full'>
-              <Text
-                padding='10px 16px'
-                fontSize='16px'
-                fontWeight='bold'
-                color='#fff'
-                backgroundColor='#E2AA57'
-                borderRadius='32px'
-              >
-                No Container: {container?.kodecontainer ?? 'null'}
-              </Text>
-              <Text
-                padding='10px 16px'
-                fontSize='16px'
-                fontWeight='bold'
-                color='#fff'
-                backgroundColor='#E2AA57'
-                borderRadius='32px'
-              >
-                No Seal: {container?.noseal ?? 'null'}
-              </Text>
-              <Text
-                padding='10px 16px'
-                fontSize='16px'
-                fontWeight='bold'
-                color='#fff'
-                backgroundColor='#E2AA57'
-                borderRadius='32px'
-              >
-                Capacity: {container?.nama ?? 'null'}
-              </Text>
-              {/* <Text padding="10px 16px" fontSize='20px' fontWeight='bold' color='#000000'>
+          {props.loadingGetJobsheet ? (
+            <Flex alignItems='center' gridGap='15px' w='full'>
+              <Skeleton w='250px' h='40px' />
+              <Skeleton w='250px' h='40px' />
+              <Skeleton w='250px' h='40px' />
+            </Flex>
+          ) : (
+            props.listContainer.map((container: any, index: number) => (
+              <Flex alignItems='center' key={index} gridGap='15px' w='full'>
+                <Text
+                  padding='10px 16px'
+                  fontSize='16px'
+                  fontWeight='bold'
+                  color='#fff'
+                  backgroundColor='#E2AA57'
+                  borderRadius='32px'
+                >
+                  No Container: {container?.kodecontainer ?? 'null'}
+                </Text>
+                <Text
+                  padding='10px 16px'
+                  fontSize='16px'
+                  fontWeight='bold'
+                  color='#fff'
+                  backgroundColor='#E2AA57'
+                  borderRadius='32px'
+                >
+                  No Seal: {container?.noseal ?? 'null'}
+                </Text>
+                <Text
+                  padding='10px 16px'
+                  fontSize='16px'
+                  fontWeight='bold'
+                  color='#fff'
+                  backgroundColor='#E2AA57'
+                  borderRadius='32px'
+                >
+                  Capacity: {container?.nama ?? 'null'}
+                </Text>
+                {/* <Text padding="10px 16px" fontSize='20px' fontWeight='bold' color='#000000'>
                 Notes: {container?.notes ?? 'null'}
               </Text> */}
-            </Flex>
-          ))}
+              </Flex>
+            ))
+          )}
           <Flex
             alignItems='center'
             gridGap='14px'
@@ -85,14 +111,18 @@ const AppHeader: React.FC<IProps> = (props) => {
                 </clipPath>
               </defs>
             </Icon>
-            <Text
-              lineHeight='25px'
-              fontSize='18px'
-              fontWeight='600'
-              color='#8C8C8C'
-            >
-              {props.lokasiStuffing}
-            </Text>
+            {props.loadingGetJobsheet ? (
+              <Skeleton w='50%' h='30px' />
+            ) : (
+              <Text
+                lineHeight='25px'
+                fontSize='18px'
+                fontWeight='600'
+                color='#8C8C8C'
+              >
+                {props.lokasiStuffing}
+              </Text>
+            )}
           </Flex>
         </Flex>
         <Flex
@@ -100,17 +130,21 @@ const AppHeader: React.FC<IProps> = (props) => {
           justifyContent='space-between'
           marginTop='21px'
         >
-          {props.title && (
-            <Text
-              fontSize='20px'
-              fontWeight='bold'
-              padding='16px 24px'
-              color='#fff'
-              backgroundColor='#E25757'
-              borderRadius='16px'
-            >
-              {props.title}
-            </Text>
+          {props.loadingGetJobsheet ? (
+            <Skeleton w='80%' h='40px' />
+          ) : (
+            props.title && (
+              <Text
+                fontSize='20px'
+                fontWeight='bold'
+                padding='16px 24px'
+                color='#fff'
+                backgroundColor='#E25757'
+                borderRadius='16px'
+              >
+                {props.title}
+              </Text>
+            )
           )}
           <Flex alignItems='center' gridGap='24px' marginLeft='auto'>
             <Button
@@ -135,7 +169,19 @@ const AppHeader: React.FC<IProps> = (props) => {
             </Button>
           </Flex>
         </Flex>
-
+        {idParams && (
+          <Link
+            _hover={{
+              textDecoration: 'unset',
+            }}
+            target='_blank'
+            href={`https://panellokasee.host/apcargo/public/admin/fix_mainjobsheet?parent_table=fix_shipment&parent_columns=kodeshipment,stuffing&parent_columns_alias=&parent_id=${idParams}&return_url=https%3A%2F%2Fpanellokasee.host%2Fapcargo%2Fpublic%2Fadmin%2Ffix_shipment52&foreign_key=fix_shipment_id&label=Job+Sheet`}
+          >
+            <Button my='3' w='full' colorScheme='linkedin'>
+              Lihat Jobsheet
+            </Button>
+          </Link>
+        )}
         {/* {props.title && (
           <Text mr='15px' fontSize='20px' fontWeight='bold' color='#000000'>
             Lokasi Stuffing:{' '}
@@ -200,12 +246,17 @@ const AppHeader: React.FC<IProps> = (props) => {
               </Text>
               <Input
                 name='ratePajak'
-                // value={convertUSDFormat(
-                //   Number(props.dataAppHeaderForm.ratePajak),
-                //   'IDR'
-                // )}
-                value={props.dataAppHeaderForm.ratePajak}
-                onChange={props.handleChangeDataAppHeaderForm}
+                onChange={(e) =>
+                  props.handleChangeDataAppHeaderForm({
+                    target: {
+                      name: 'ratePajak',
+                      value: convertPriceStringToNumber(e.target.value),
+                    },
+                  })
+                }
+                value={toFormatPrice(props.dataAppHeaderForm.ratePajak, 'IDR')}
+                // value={props.dataAppHeaderForm.ratePajak}
+                // onChange={props.handleChangeDataAppHeaderForm}
                 height='40px'
                 type='string'
               />
@@ -225,10 +276,19 @@ const AppHeader: React.FC<IProps> = (props) => {
                 //   Number(props.dataAppHeaderForm.rateBonus),
                 //   'IDR'
                 // )}
-                value={props.dataAppHeaderForm.rateBonus}
-                onChange={props.handleChangeDataAppHeaderForm}
+                // value={props.dataAppHeaderForm.rateBonus}
+                // onChange={props.handleChangeDataAppHeaderForm}
                 height='40px'
                 type='string'
+                onChange={(e) =>
+                  props.handleChangeDataAppHeaderForm({
+                    target: {
+                      name: 'rateBonus',
+                      value: convertPriceStringToNumber(e.target.value),
+                    },
+                  })
+                }
+                value={toFormatPrice(props.dataAppHeaderForm.rateBonus, 'IDR')}
               />
             </Box>
           </Flex>

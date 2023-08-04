@@ -33,7 +33,7 @@ export interface IDataBuying extends IFormBuying {
   id: number;
 }
 export interface IDataSeling extends IFormSelling {
-  id: number;
+  id: string;
 }
 
 export interface IDataValue {

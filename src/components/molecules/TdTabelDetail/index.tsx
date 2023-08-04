@@ -7,7 +7,7 @@ import { convertUSDFormat } from '../../../App';
 import style from './style.module.css';
 
 interface IProps {
-  id?: number;
+  id?: string;
   name: string;
   total?: string;
   nominal?: string;
@@ -19,8 +19,8 @@ interface IProps {
   qty?: number;
   percentage?: number;
   valueAddedTax?: string;
-  onEdit?: (id: number) => void;
-  onDelete?: (id: number) => void;
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
   isCustom?: boolean;
   currency?: string;
   price?: number;
@@ -33,12 +33,16 @@ interface IProps {
 const TdTabelDetail: React.FC<IProps> = (props) => {
   const handleEdit = () => {
     if (props.haveAction && props.onEdit) {
-      props.onEdit(Number(props.id) ?? 0);
+      props.onEdit(String(props.id) ?? 0);
     }
   };
   const handleDelete = () => {
+    // console.log('handleDelete');
+    // console.log(props.id);
+    // console.log(props.haveAction);
+    // console.log(props.onDelete);
     if (props.haveAction && props.onDelete) {
-      props.onDelete(Number(props.id) ?? 0);
+      props.onDelete(String(props.id) ?? 0);
     }
   };
 

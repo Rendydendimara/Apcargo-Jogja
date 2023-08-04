@@ -25,6 +25,7 @@ import {
 } from '@chakra-ui/react';
 import { Button } from '@chakra-ui/button';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 import findIndex from 'lodash/findIndex';
 import AppHeader from './components/molecules/AppHeader';
 import FormBuying from './components/molecules/FormBuying';
@@ -91,7 +92,7 @@ const DummyCustomerID: ISelectJobSheetID[] = [
 
 const DUMMY_SELLING: IDataSeling[] = [
   {
-    id: 1,
+    id: '1',
     fixIsiJobsheetID: {
       label: 'Label',
       value: '23',
@@ -154,8 +155,7 @@ function App() {
     valueAddedTax: 'no',
   });
   const [idEditFormBuying, setIdEditFormBuying] = useState<number | null>(null);
-  const [idEditFormSelling, setIdEditFormSelling] =
-    useState<number | null>(null);
+  const [idEditFormSelling, setIdEditFormSelling] = useState<string>('');
   const [isEditExitsAktifBuy, setIsEditExitsAktifBuy] =
     useState<boolean>(false);
   const [isEditExitsAktifSell, setIsEditExitsAktifSell] =
@@ -459,7 +459,8 @@ function App() {
 
   const handleAddUpdateListDataSelling = () => {
     // console.log('dataSellingForm', dataSellingForm);
-
+    console.log('idEditFormSelling', idEditFormSelling);
+    console.log('listDataSelling', listDataSelling);
     if (idEditFormSelling) {
       if (isEditExitsAktifSell) {
         const indexData = findIndex(dataAktifSell, [
@@ -485,8 +486,12 @@ function App() {
         ]);
         setIsEditExitsAktifBuy(false);
       } else {
-        const indexData = findIndex(listDataSelling, ['id', idEditFormSelling]);
-        setListDataSelling([
+        const indexData = findIndex(listDataSelling, [
+          'id',
+          String(idEditFormSelling),
+        ]);
+        console.log('indexData', indexData);
+        const updateData = [
           ...listDataSelling.slice(0, indexData),
           {
             id: idEditFormSelling,
@@ -501,9 +506,11 @@ function App() {
             valueAddedTax: dataSellingForm.valueAddedTax,
           },
           ...listDataSelling.slice(indexData + 1, listDataSelling.length),
-        ]);
+        ];
+        console.log('updateData', updateData);
+        setListDataSelling(updateData);
       }
-      setIdEditFormSelling(null);
+      setIdEditFormSelling('');
       toast({
         title: 'Success',
         description: 'success update data selling.',
@@ -521,7 +528,7 @@ function App() {
       const temp = [
         ...listDataSelling,
         {
-          id: new Date().getTime(),
+          id: uuidv4(),
           fixIsiJobsheetID: dataSellingForm.fixIsiJobsheetID,
           nominalDipakai1IDR2USD: dataSellingForm.nominalDipakai1IDR2USD,
           nominal: dataSellingForm.nominal,
@@ -607,8 +614,8 @@ function App() {
     if (idEditFormBuying !== null) {
       setIdEditFormBuying(null);
     }
-    if (idEditFormSelling !== null) {
-      setIdEditFormSelling(null);
+    if (idEditFormSelling !== '') {
+      setIdEditFormSelling('');
     }
   };
 
@@ -667,7 +674,7 @@ function App() {
     setDataAktifBuy(newData);
   };
 
-  const handleEditDataSelling = (id: number) => {
+  const handleEditDataSelling = (id: string) => {
     if (isEditExitsAktifSell) {
       setIsEditExitsAktifSell(false);
     }
@@ -675,7 +682,7 @@ function App() {
       (data: IDataSeling) => data.id === id
     );
     if (selectedData.length > 0) {
-      setIdEditFormSelling(id);
+      setIdEditFormSelling(String(id));
       setDataSellingForm({
         fixIsiJobsheetID: selectedData[0].fixIsiJobsheetID,
         nominalDipakai1IDR2USD: selectedData[0].nominalDipakai1IDR2USD,
@@ -690,11 +697,11 @@ function App() {
     }
   };
 
-  const handleEditDataAktifSell = (id: number) => {
+  const handleEditDataAktifSell = (id: string) => {
     // console.log('dataAktifSell', dataAktifSell);
     // console.log('id', id);
     let selectedData = dataAktifSell.filter(
-      (data: any) => Number(data.id) === id
+      (data: any) => String(data.id) === id
     );
 
     if (selectedData.length > 0) {
@@ -719,12 +726,12 @@ function App() {
     }
   };
 
-  const handleDeleteDataAktifSell = (id: number) => {
-    const newData = dataAktifSell.filter((data: any) => Number(data.id) !== id);
+  const handleDeleteDataAktifSell = (id: string) => {
+    const newData = dataAktifSell.filter((data: any) => data.id !== id);
     setDataAktifSell(newData);
   };
 
-  const handleDeleteDataSelling = (id: number) => {
+  const handleDeleteDataSelling = (id: string) => {
     const newDataSelling = listDataSelling.filter(
       (data: IDataSeling) => data.id !== id
     );
@@ -836,7 +843,7 @@ function App() {
       let tempListDataSelling: any[] = [];
       aktif.sell.forEach((data: any) => {
         tempListDataSelling.push({
-          id: data.id,
+          id: data.id ? data.id : uuidv4(),
           fixIsiJobsheetID: getJobSheet(data.fix_isijobsheet_id),
           nominalDipakai1IDR2USD: data.nominaldipakai,
           nominal: data.nominal,
@@ -848,6 +855,7 @@ function App() {
           valueAddedTax: data.valueaddedtax ? data.valueaddedtax : 'no',
         });
       });
+      console.log('tempListDataSelling', tempListDataSelling);
       setListDataSelling(tempListDataSelling);
     }
     setLoadingGetJobsheet(false);
@@ -1204,6 +1212,7 @@ function App() {
       },
     };
     // console.log('data', data);
+    // setIsLoadingFetchPost(false);
     axios
       .post('https://panellokasee.host/apcargo/public/postDataJS', data)
       .then((res: any) => {
@@ -1442,7 +1451,14 @@ function App() {
           />
         </ModalContent>
       </Modal>
-      <Text mt='100px' textAlign='center' color='gray.600' fontSize='sm'>
+      <Text
+        fontStyle='italic'
+        color='yellow.500'
+        fontWeight='bold'
+        mt='100px'
+        textAlign='center'
+        fontSize='sm'
+      >
         Version 4823
       </Text>
     </Box>

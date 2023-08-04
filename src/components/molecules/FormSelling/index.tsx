@@ -12,7 +12,7 @@ interface IProps {
   listCustomerID: ISelectJobSheetID[];
   listSelectJobSheetID: ISelectJobSheetID[];
   dataSellingForm: IFormSelling;
-  idEditFormSelling: number | null;
+  idEditFormSelling: string;
   handleChangeCustomerIDSelling: (
     newValue: OnChangeValue<ISelectJobSheetID, false>,
     actionMeta: ActionMeta<any>
@@ -32,7 +32,7 @@ interface IProps {
 const FormSelling: React.FC<IProps> = (props) => {
   const isDisabledSubmit = (): boolean => {
     if (
-      props.dataSellingForm.customerID === null ||
+      // props.dataSellingForm.customerID === null ||
       props.dataSellingForm.fixIsiJobsheetID === null ||
       props.dataSellingForm.nominalDipakai1IDR2USD.length === 0 ||
       props.dataSellingForm.nominal.length === 0 ||
@@ -73,7 +73,7 @@ const FormSelling: React.FC<IProps> = (props) => {
             placeholder='Select customer id'
             styles={colourStyles}
             value={props.dataSellingForm.customerID}
-            isDisabled={props.idEditFormSelling !== null}
+            isDisabled={props.idEditFormSelling !== ''}
           />
         </Box>
         <Box w='full' marginBottom='20px'>

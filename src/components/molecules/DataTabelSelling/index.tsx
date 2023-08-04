@@ -28,11 +28,11 @@ interface IProps {
   listDataSelling: IDataSeling[];
   dataAktifSell: any[];
   dataTabelDetailSelling: any[];
-  handleEditDataSelling: (id: number) => void;
-  handleDeleteDataSelling: (id: number) => void;
+  handleEditDataSelling: (id: string) => void;
+  handleDeleteDataSelling: (id: string) => void;
   getBiayaLapangName: (id: string) => string;
-  handleEditDataAktifSell: (id: number) => void;
-  handleDeleteDataAktifSell: (id: number) => void;
+  handleEditDataAktifSell: (id: string) => void;
+  handleDeleteDataAktifSell: (id: string) => void;
   handleDeleteDataCustomer: (id: string) => void;
 }
 

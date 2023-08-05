@@ -40,7 +40,7 @@ const TdTabelDetailBuying: React.FC<IProps> = (props) => {
         <TableCell className={style.dataTabelDetail}>
           {props.name.replaceAll('_', ' ')}
         </TableCell>
-        <TableCell align='left' className={style.dataTabelDetail}>
+        <TableCell align='right' className={style.dataTabelDetail}>
           {props.total ? convertUSDFormat(Number(props.total ?? 0), 'IDR') : 0}
         </TableCell>
       </TableRow>
@@ -55,18 +55,18 @@ const TdTabelDetailBuying: React.FC<IProps> = (props) => {
       <TableCell className={style.dataTabelDetail}>
         {props.name.replaceAll('_', ' ')}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
+      <TableCell align='right' className={style.dataTabelDetail}>
         {props.total ? convertUSDFormat(Number(props.total ?? 0), 'IDR') : 0}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
+      <TableCell align='right' className={style.dataTabelDetail}>
         {props.nominal
           ? convertUSDFormat(Number(props.nominal ?? 0), 'IDR')
           : 0}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
+      <TableCell align='right' className={style.dataTabelDetail}>
         {props.kurs ? convertUSDFormat(Number(props.kurs ?? 0), 'IDR') : 0}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
+      <TableCell align='right' className={style.dataTabelDetail}>
         {props.nominalDolar
           ? convertUSDFormat(Number(props.nominalDolar), 'IDR')
           : 0}

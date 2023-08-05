@@ -47,16 +47,16 @@ const DataTabelBuying: React.FC<IProps> = (props) => {
                 <TableCell style={{ minWidth: 200 }}>
                   Fix Isi Jobsheet ID
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='left'>
+                <TableCell style={{ minWidth: 170 }} align='right'>
                   Nominal Dipakai 1 IDR 2 USD
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='left'>
+                <TableCell style={{ minWidth: 170 }} align='right'>
                   Nominal
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='left'>
+                <TableCell style={{ minWidth: 170 }} align='right'>
                   Kurs
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='left'>
+                <TableCell style={{ minWidth: 170 }} align='right'>
                   Nominal Dollar
                 </TableCell>
                 <TableCell style={{ minWidth: 170 }} align='center'>

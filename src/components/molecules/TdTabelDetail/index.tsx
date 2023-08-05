@@ -156,25 +156,28 @@ const TdTabelDetail: React.FC<IProps> = (props) => {
       <TableCell align='left' className={style.dataTabelDetail}>
         {props.name.replaceAll('_', ' ')}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
-        {props.total ? props.total : 0}
+      <TableCell align='right' className={style.dataTabelDetail}>
+        {convertUSDFormat(Number(props.total ? props.total : 0), 'IDR')}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
-        {props.nominal ? props.nominal : 0}
+      <TableCell align='right' className={style.dataTabelDetail}>
+        {convertUSDFormat(Number(props.nominal ? props.nominal : 0), 'IDR')}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
-        {props.kurs ? props.kurs : 0}
+      <TableCell align='right' className={style.dataTabelDetail}>
+        {convertUSDFormat(Number(props.kurs ? props.kurs : 0), 'IDR')}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
-        {props.nominalDolar ? props.nominalDolar : 0}
+      <TableCell align='right' className={style.dataTabelDetail}>
+        {convertUSDFormat(
+          Number(props.nominalDolar ? props.nominalDolar : 0),
+          'IDR'
+        )}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
+      <TableCell align='right' className={style.dataTabelDetail}>
         {props.qty ? props.qty : 0}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
+      <TableCell align='right' className={style.dataTabelDetail}>
         {props.percentage ? props.percentage : 0}
       </TableCell>
-      <TableCell align='left' className={style.dataTabelDetail}>
+      <TableCell align='right' className={style.dataTabelDetail}>
         {props.valueAddedTax ? props.valueAddedTax : '-'}
       </TableCell>
       <TableCell align='center' className={style.dataTabelDetail}>

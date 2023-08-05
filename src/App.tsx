@@ -458,9 +458,6 @@ function App() {
   };
 
   const handleAddUpdateListDataSelling = () => {
-    // console.log('dataSellingForm', dataSellingForm);
-    console.log('idEditFormSelling', idEditFormSelling);
-    console.log('listDataSelling', listDataSelling);
     if (idEditFormSelling) {
       if (isEditExitsAktifSell) {
         const indexData = findIndex(dataAktifSell, [
@@ -490,7 +487,6 @@ function App() {
           'id',
           String(idEditFormSelling),
         ]);
-        console.log('indexData', indexData);
         const updateData = [
           ...listDataSelling.slice(0, indexData),
           {
@@ -507,7 +503,6 @@ function App() {
           },
           ...listDataSelling.slice(indexData + 1, listDataSelling.length),
         ];
-        console.log('updateData', updateData);
         setListDataSelling(updateData);
       }
       setIdEditFormSelling('');
@@ -855,7 +850,6 @@ function App() {
           valueAddedTax: data.valueaddedtax ? data.valueaddedtax : 'no',
         });
       });
-      console.log('tempListDataSelling', tempListDataSelling);
       setListDataSelling(tempListDataSelling);
     }
     setLoadingGetJobsheet(false);
@@ -1075,14 +1069,36 @@ function App() {
     let costomerSellingGroups: any = [];
     let customerSelling: any[] = [];
     let tempSelling: any = [];
-    countCustomer.map((customer: any) => {
-      costomerSellingGroups.push(sellingGroups[customer.customerID.value]);
+    let IS_HAVE_ERROR_DATA = false;
+    countCustomer.map((customer: any, i: number) => {
+      if (customer.customerID) {
+        costomerSellingGroups.push(sellingGroups[customer.customerID.value]);
+      } else {
+        IS_HAVE_ERROR_DATA = true;
+        return;
+      }
     });
+    if (IS_HAVE_ERROR_DATA) {
+      toast({
+        title: 'Data Error',
+        description: 'Gagal post data karena ada data selling yang error.',
+        status: 'error',
+        position: 'bottom-right',
+        duration: 5000,
+        isClosable: true,
+      });
+      setIsLoadingFetchPost(false);
+      return;
+    }
     costomerSellingGroups.forEach((customerSellings: IDataSeling[]) => {
       let total3A: number = 0;
       let total3B: number = 0;
       let total3C: number = 0;
       customerSellings.forEach((selling: IDataSeling) => {
+        if (selling.customerID === null || selling.fixIsiJobsheetID === null) {
+          IS_HAVE_ERROR_DATA = true;
+          return;
+        }
         let currency = getCurrency(selling.nominalDipakai1IDR2USD);
         let price = getPrice(
           selling.nominalDipakai1IDR2USD,
@@ -1196,6 +1212,18 @@ function App() {
         jid: data.jid,
       });
     });
+    if (IS_HAVE_ERROR_DATA) {
+      toast({
+        title: 'Data Error',
+        description: 'Gagal post data karena ada data selling yang error.',
+        status: 'error',
+        position: 'bottom-right',
+        duration: 5000,
+        isClosable: true,
+      });
+      setIsLoadingFetchPost(false);
+      return;
+    }
 
     const data = {
       jobsheet: {
@@ -1211,33 +1239,33 @@ function App() {
         sellingAktif: dataSellingAktif,
       },
     };
-    // console.log('data', data);
-    // setIsLoadingFetchPost(false);
-    axios
-      .post('https://panellokasee.host/apcargo/public/postDataJS', data)
-      .then((res: any) => {
-        setIsLoadingFetchPost(false);
-        toast({
-          title: 'Success',
-          description: 'Success post data.',
-          status: 'success',
-          position: 'bottom-right',
-          duration: 5000,
-          isClosable: true,
-        });
-      })
-      .catch((err: any) => {
-        setIsLoadingFetchPost(false);
-        toast({
-          title: 'Failed',
-          description: 'Pailed post data.',
-          status: 'error',
-          position: 'bottom-right',
-          duration: 5000,
-          isClosable: true,
-        });
-        console.log('err', err);
-      });
+    console.log('data', data);
+    setIsLoadingFetchPost(false);
+    // axios
+    //   .post('https://panellokasee.host/apcargo/public/postDataJS', data)
+    //   .then((res: any) => {
+    //     setIsLoadingFetchPost(false);
+    //     toast({
+    //       title: 'Success',
+    //       description: 'Success post data.',
+    //       status: 'success',
+    //       position: 'bottom-right',
+    //       duration: 5000,
+    //       isClosable: true,
+    //     });
+    //   })
+    //   .catch((err: any) => {
+    //     setIsLoadingFetchPost(false);
+    //     toast({
+    //       title: 'Failed',
+    //       description: 'Failed post data.',
+    //       status: 'error',
+    //       position: 'bottom-right',
+    //       duration: 5000,
+    //       isClosable: true,
+    //     });
+    //     console.log('err', err);
+    //   });
   };
 
   const handleDeleteDataCustomer = (customerId: string) => {

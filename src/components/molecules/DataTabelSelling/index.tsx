@@ -41,16 +41,35 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
   let total3A: number = 0;
   let total3B: number = 0;
   let total3C: number = 0;
+
   useEffect(() => {
-    const sellingGroups: any = groupBy(
-      props.listDataSelling,
+    const dataWithCustomerId = props.listDataSelling.filter(
+      (dt) => dt.customerID !== null
+    );
+    const dataWithoutCustomerId = props.listDataSelling.filter(
+      (dt) => dt.customerID === null
+    );
+    const sellingGroupsWithoutCustomerId: any = groupBy(
+      dataWithoutCustomerId,
       'jid' // 'customerID.value'
     );
-    const countCustomer = uniqBy(props.listDataSelling, 'jid'); // 'customerID');
+    const sellingGroupsWithCustomerId: any = groupBy(
+      dataWithCustomerId,
+      'customerID.value'
+    );
+
+    const countCustomerWithoutCustomerId = uniqBy(dataWithoutCustomerId, 'jid'); // 'customerID');
     let temp: any = [];
-    countCustomer.map((customer: any) => {
-      // temp.push(sellingGroups[customer.customerID.value]);
-      temp.push(sellingGroups[customer.jid]);
+    countCustomerWithoutCustomerId.map((customer: any) => {
+      temp.push(sellingGroupsWithoutCustomerId[customer.jid]);
+    });
+
+    const countCustomerWithCustomerId = uniqBy(
+      dataWithCustomerId,
+      'customerID'
+    );
+    countCustomerWithCustomerId.map((customer: any) => {
+      temp.push(sellingGroupsWithCustomerId[customer.customerID.value]);
     });
     setListDataSellingGroup(temp);
   }, [props.listDataSelling]);
@@ -80,18 +99,21 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                 overflowY='scroll'
                 padding='10px'
               >
-                {/* <Text fontSize='18px' fontWeight='bold' my='10px'>
-                  {listDataSeling[0].customerID?.label}
-                </Text> */}
-                <Text
-                  fontSize='18px'
-                  color='red'
-                  fontStyle='italic'
-                  fontWeight='bold'
-                  my='10px'
-                >
-                  Customer Info Sedang Dalam Bermasalah
-                </Text>
+                {listDataSeling[0].customerID?.label ? (
+                  <Text fontSize='18px' fontWeight='bold' my='10px'>
+                    {listDataSeling[0].customerID?.label}
+                  </Text>
+                ) : (
+                  <Text
+                    fontSize='18px'
+                    color='red'
+                    fontStyle='italic'
+                    fontWeight='bold'
+                    my='10px'
+                  >
+                    Customer Info Sedang Dalam Bermasalah
+                  </Text>
+                )}
                 <Table
                   sx={{ minWidth: 750 }}
                   stickyHeader
@@ -186,7 +208,8 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                           <TdTabelDetail
                             haveAction={true}
                             name={
-                              dataSeling.fixIsiJobsheetID?.label ?? 'NAMEEE'
+                              dataSeling.fixIsiJobsheetID?.label ??
+                              'ERROR_TIDAK_DITEMUKAN'
                             }
                             total={String(dataSeling.nominalDipakai1IDR2USD)}
                             nominal={String(dataSeling.nominal)}

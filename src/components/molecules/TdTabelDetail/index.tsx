@@ -1,5 +1,5 @@
 import Button from '@mui/material/Button';
-import { Flex } from '@chakra-ui/layout';
+import { Flex, Text } from '@chakra-ui/layout';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import React from 'react';
@@ -72,7 +72,13 @@ const TdTabelDetail: React.FC<IProps> = (props) => {
           {props.customerID ? props.customerID.label : '-'}
         </TableCell> */}
         <TableCell align='left' className={style.dataTabelDetail}>
-          {props.name.replaceAll('_', ' ')}
+          {props.name === 'ERROR_TIDAK_DITEMUKAN' ? (
+            <Text fontSize='12px' fontStyle='italic'>
+              Id item tidak ditemukan
+            </Text>
+          ) : (
+            props.name.replaceAll('_', ' ')
+          )}
         </TableCell>
         <TableCell align='left' className={style.dataTabelDetail}>
           {props.qty ? props.qty : 0}

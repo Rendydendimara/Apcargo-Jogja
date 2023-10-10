@@ -1239,33 +1239,33 @@ function App() {
         sellingAktif: dataSellingAktif,
       },
     };
-    console.log('data', data);
-    setIsLoadingFetchPost(false);
-    // axios
-    //   .post('https://panellokasee.host/apcargo/public/postDataJS', data)
-    //   .then((res: any) => {
-    //     setIsLoadingFetchPost(false);
-    //     toast({
-    //       title: 'Success',
-    //       description: 'Success post data.',
-    //       status: 'success',
-    //       position: 'bottom-right',
-    //       duration: 5000,
-    //       isClosable: true,
-    //     });
-    //   })
-    //   .catch((err: any) => {
-    //     setIsLoadingFetchPost(false);
-    //     toast({
-    //       title: 'Failed',
-    //       description: 'Failed post data.',
-    //       status: 'error',
-    //       position: 'bottom-right',
-    //       duration: 5000,
-    //       isClosable: true,
-    //     });
-    //     console.log('err', err);
-    //   });
+    // console.log('data', data);
+    // setIsLoadingFetchPost(false);
+    axios
+      .post('https://panellokasee.host/apcargo/public/postDataJS', data)
+      .then((res: any) => {
+        setIsLoadingFetchPost(false);
+        toast({
+          title: 'Success',
+          description: 'Success post data.',
+          status: 'success',
+          position: 'bottom-right',
+          duration: 5000,
+          isClosable: true,
+        });
+      })
+      .catch((err: any) => {
+        setIsLoadingFetchPost(false);
+        toast({
+          title: 'Failed',
+          description: 'Failed post data.',
+          status: 'error',
+          position: 'bottom-right',
+          duration: 5000,
+          isClosable: true,
+        });
+        console.log('err', err);
+      });
   };
 
   const handleDeleteDataCustomer = (customerId: string) => {

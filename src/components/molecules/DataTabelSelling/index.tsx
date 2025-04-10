@@ -1,18 +1,18 @@
-import { Box, Flex, Text } from '@chakra-ui/layout';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import groupBy from 'lodash/groupBy';
-import uniqBy from 'lodash/uniqBy';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
-import { IDataSeling, IDataTabelBuying } from '../../../interface';
-import TdTabelDetail from '../TdTabelDetail';
-import React, { useState, useEffect } from 'react';
-import { RenderDetailTabelBuying } from '../RenderDetailTabelBuying';
-import { muiTheme } from '../../../utils/mui';
+import { Box, Flex, Text } from "@chakra-ui/layout";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import groupBy from "lodash/groupBy";
+import uniqBy from "lodash/uniqBy";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
+import { IDataSeling, IDataTabelBuying } from "../../../interface";
+import TdTabelDetail from "../TdTabelDetail";
+import React, { useState, useEffect } from "react";
+import { RenderDetailTabelBuying } from "../RenderDetailTabelBuying";
+import { muiTheme } from "../../../utils/mui";
 import {
   getCurrency,
   getPrice,
@@ -20,9 +20,9 @@ import {
   getTotalUSD,
   getGrandTotal,
   getTax,
-} from '../../../utils/selling';
-import { Button } from '@chakra-ui/button';
-import { convertUSDFormat } from '../../../App';
+} from "../../../utils/selling";
+import { Button } from "@chakra-ui/button";
+import { convertUSDFormat } from "../../../App";
 
 interface IProps {
   listDataSelling: IDataSeling[];
@@ -51,14 +51,14 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
     );
     const sellingGroupsWithoutCustomerId: any = groupBy(
       dataWithoutCustomerId,
-      'jid' // 'customerID.value'
+      "jid" // 'customerID.value'
     );
     const sellingGroupsWithCustomerId: any = groupBy(
       dataWithCustomerId,
-      'customerID.value'
+      "customerID.value"
     );
 
-    const countCustomerWithoutCustomerId = uniqBy(dataWithoutCustomerId, 'jid'); // 'customerID');
+    const countCustomerWithoutCustomerId = uniqBy(dataWithoutCustomerId, "jid"); // 'customerID');
     let temp: any = [];
     countCustomerWithoutCustomerId.map((customer: any) => {
       temp.push(sellingGroupsWithoutCustomerId[customer.jid]);
@@ -66,7 +66,7 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
 
     const countCustomerWithCustomerId = uniqBy(
       dataWithCustomerId,
-      'customerID'
+      "customerID"
     );
     countCustomerWithCustomerId.map((customer: any) => {
       temp.push(sellingGroupsWithCustomerId[customer.customerID.value]);
@@ -85,31 +85,31 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
           total3C = 0;
           return (
             <Box
-              w='full'
-              borderWidth='2px'
-              borderColor='gray.400'
-              height='auto'
+              w="full"
+              borderWidth="2px"
+              borderColor="gray.400"
+              height="auto"
               key={index}
-              marginTop='30px'
+              marginTop="30px"
             >
               <Box
-                borderRadius='16px'
-                h='300px'
-                maxH='300px'
-                overflowY='scroll'
-                padding='10px'
+                borderRadius="16px"
+                h="300px"
+                maxH="300px"
+                overflowY="scroll"
+                padding="10px"
               >
                 {listDataSeling[0].customerID?.label ? (
-                  <Text fontSize='18px' fontWeight='bold' my='10px'>
+                  <Text fontSize="18px" fontWeight="bold" my="10px">
                     {listDataSeling[0].customerID?.label}
                   </Text>
                 ) : (
                   <Text
-                    fontSize='18px'
-                    color='red'
-                    fontStyle='italic'
-                    fontWeight='bold'
-                    my='10px'
+                    fontSize="18px"
+                    color="red"
+                    fontStyle="italic"
+                    fontWeight="bold"
+                    my="10px"
                   >
                     Customer Info Sedang Dalam Bermasalah
                   </Text>
@@ -117,43 +117,43 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                 <Table
                   sx={{ minWidth: 750 }}
                   stickyHeader
-                  aria-label='sticky table'
-                  size='small'
+                  aria-label="sticky table"
+                  size="small"
                 >
                   <TableHead>
                     <TableRow>
                       {/* <TableCell style={{ minWidth: 200 }}>Customer ID</TableCell> */}
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         ITEMS
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         QTY (Quantity)
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         Percentage
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         CUR
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         Price
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         Rate
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         Total IDR
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         Total USD
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         Grand Total
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='left'>
+                      <TableCell style={{ minWidth: 170 }} align="left">
                         Tax
                       </TableCell>
-                      <TableCell style={{ minWidth: 170 }} align='center'>
+                      <TableCell style={{ minWidth: 170 }} align="center">
                         Action
                       </TableCell>
                     </TableRow>
@@ -209,7 +209,7 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                             haveAction={true}
                             name={
                               dataSeling.fixIsiJobsheetID?.label ??
-                              'ERROR_TIDAK_DITEMUKAN'
+                              "ERROR_TIDAK_DITEMUKAN"
                             }
                             total={String(dataSeling.nominalDipakai1IDR2USD)}
                             nominal={String(dataSeling.nominal)}
@@ -244,33 +244,33 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                       <TableCell rowSpan={4} />
                       <TableCell rowSpan={4} />
                       <TableCell colSpan={2} />
-                      <TableCell align='left'>
-                        {convertUSDFormat(total3A, 'IDR')}
+                      <TableCell align="left">
+                        {convertUSDFormat(total3A, "IDR")}
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell colSpan={2}>Tax</TableCell>
-                      <TableCell align='left'>
-                        {convertUSDFormat(total3B, 'IDR')}
+                      <TableCell align="left">
+                        {convertUSDFormat(total3B, "IDR")}
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell colSpan={2}>Total</TableCell>
-                      <TableCell align='left'>
-                        {convertUSDFormat(total3C, 'IDR')}
+                      <TableCell align="left">
+                        {convertUSDFormat(total3C, "IDR")}
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell align='center' colSpan={3}>
+                      <TableCell align="center" colSpan={3}>
                         <Button
                           style={{
-                            backgroundColor: '#29b6f6',
+                            backgroundColor: "#29b6f6",
                             borderRadius: 8,
                             height: 50,
-                            width: '100%',
+                            width: "100%",
                             fontSize: 16,
                             fontWeight: 600,
-                            color: 'white',
+                            color: "white",
                           }}
                         >
                           Go To Invoice
@@ -281,21 +281,21 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                   </TableBody>
                 </Table>
               </Box>
-              <Flex justifyContent='center' my='20px'>
+              <Flex justifyContent="center" my="20px">
                 <Button
                   onClick={() =>
                     props.handleDeleteDataCustomer(
-                      listDataSeling[0].customerID?.value ?? '0'
+                      listDataSeling[0].customerID?.value ?? "0"
                     )
                   }
                   style={{
-                    backgroundColor: '#e64a19',
+                    backgroundColor: "#e64a19",
                     borderRadius: 8,
                     height: 50,
-                    width: '50%',
+                    width: "50%",
                     fontSize: 16,
                     fontWeight: 600,
-                    color: 'white',
+                    color: "white",
                   }}
                 >
                   Delete Table
@@ -306,36 +306,36 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
         }
       )}
       <Box
-        display='none'
-        w='full'
-        borderWidth='2px'
-        borderColor='gray.400'
-        height='auto'
-        marginTop='30px'
+        display="none"
+        w="full"
+        borderWidth="2px"
+        borderColor="gray.400"
+        height="auto"
+        marginTop="30px"
       >
-        <Box borderRadius='16px' h='600px' maxH='600px' overflowY='scroll'>
+        <Box borderRadius="16px" h="600px" maxH="600px" overflowY="scroll">
           <Table
             sx={{ minWidth: 750 }}
             stickyHeader
-            aria-label='sticky table'
-            size='small'
+            aria-label="sticky table"
+            size="small"
           >
             <TableHead>
               <TableRow>
                 {/* <TableCell style={{ minWidth: 200 }}>Customer ID</TableCell> */}
-                <TableCell style={{ minWidth: 200 }} align='left'>
+                <TableCell style={{ minWidth: 200 }} align="left">
                   Fix Isi Jobsheet ID
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='left'>
+                <TableCell style={{ minWidth: 170 }} align="left">
                   Nominal Dipakai 1 IDR 2 USD
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='left'>
+                <TableCell style={{ minWidth: 170 }} align="left">
                   Nominal
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='left'>
+                <TableCell style={{ minWidth: 170 }} align="left">
                   Kurs
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='left'>
+                <TableCell style={{ minWidth: 170 }} align="left">
                   Nominal Dollar
                 </TableCell>
                 {/* <TableCell style={{ minWidth: 170 }} align='left'>
@@ -347,7 +347,7 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                 <TableCell style={{ minWidth: 170 }} align='left'>
                   Valued Added Tax
                 </TableCell> */}
-                <TableCell style={{ minWidth: 170 }} align='center'>
+                <TableCell style={{ minWidth: 170 }} align="center">
                   Action
                 </TableCell>
               </TableRow>
@@ -374,13 +374,13 @@ const DataTabelSelling: React.FC<IProps> = (props) => {
                 (data: IDataTabelBuying, index: number) => (
                   <>
                     <Text
-                      mt='10px'
-                      fontSize='13px'
-                      borderStyle='none'
-                      px='0px'
-                      fontWeight='bold'
-                      ml='4px'
-                      textTransform='capitalize'
+                      mt="10px"
+                      fontSize="13px"
+                      borderStyle="none"
+                      px="0px"
+                      fontWeight="bold"
+                      ml="4px"
+                      textTransform="capitalize"
                       key={index}
                     >
                       {data.label}

@@ -1,12 +1,12 @@
-import { Radio, RadioGroup } from '@chakra-ui/react';
-import { Button } from '@chakra-ui/button';
-import { Input } from '@chakra-ui/input';
-import { Box, Flex, Text, Stack } from '@chakra-ui/layout';
-import { Table, Tbody, Td, Tr } from '@chakra-ui/table';
-import Select, { ActionMeta, OnChangeValue, StylesConfig } from 'react-select';
-import React from 'react';
-import { IFormSelling, ISelectJobSheetID } from '../../../interface';
-import { colourStyles } from '../../../utils/select2';
+import { Radio, RadioGroup } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/button";
+import { Input } from "@chakra-ui/input";
+import { Box, Flex, Text, Stack } from "@chakra-ui/layout";
+import { Table, Tbody, Td, Tr } from "@chakra-ui/table";
+import Select, { ActionMeta, OnChangeValue, StylesConfig } from "react-select";
+import React from "react";
+import { IFormSelling, ISelectJobSheetID } from "../../../interface";
+import { colourStyles } from "../../../utils/select2";
 
 interface IProps {
   listCustomerID: ISelectJobSheetID[];
@@ -17,12 +17,12 @@ interface IProps {
     newValue: OnChangeValue<ISelectJobSheetID, false>,
     actionMeta: ActionMeta<any>
   ) => void;
-  handleChangeValueAddedTaxSelling: (value: 'yes' | 'no') => void;
+  handleChangeValueAddedTaxSelling: (value: "yes" | "no") => void;
   handleChangeDataFormSelling: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
   handleAddUpdateListDataSelling: () => void;
-  handleClearFormData: (formName: 'buying' | 'selling') => void;
+  handleClearFormData: (formName: "buying" | "selling") => void;
   handleChangeJobSheetIDSelling: (
     newValue: OnChangeValue<ISelectJobSheetID, false>,
     actionMeta: ActionMeta<any>
@@ -48,158 +48,158 @@ const FormSelling: React.FC<IProps> = (props) => {
   return (
     <Box
       w={{
-        base: '100%',
-        sm: '100%',
-        md: '50%',
-        xl: '50%',
+        base: "100%",
+        sm: "100%",
+        md: "50%",
+        xl: "50%",
       }}
     >
-      <Text fontWeight='900' fontSize='20px' lineHeight='27px' color='#333333'>
+      <Text fontWeight="900" fontSize="20px" lineHeight="27px" color="#333333">
         Selling
       </Text>
-      <Box marginTop='39px' w='full'>
-        <Box w='full' marginBottom='20px'>
+      <Box marginTop="39px" w="full">
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Customer ID
           </Text>
           <Select
             options={props.listCustomerID}
             onChange={props.handleChangeCustomerIDSelling}
-            placeholder='Select customer id'
+            placeholder="Select customer id"
             styles={colourStyles}
             value={props.dataSellingForm.customerID}
-            isDisabled={props.idEditFormSelling !== ''}
+            isDisabled={props.idEditFormSelling !== ""}
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Fix Isi Jobsheet ID
           </Text>
           <Select
             options={props.listSelectJobSheetID}
             onChange={props.handleChangeJobSheetIDSelling}
-            placeholder='Select jobsheet id'
+            placeholder="Select jobsheet id"
             styles={colourStyles}
             value={props.dataSellingForm.fixIsiJobsheetID}
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Nominal Dipakai 1 IDR 2 USD
           </Text>
           <Input
-            name='nominalDipakai1IDR2USD'
+            name="nominalDipakai1IDR2USD"
             onChange={props.handleChangeDataFormSelling}
-            height='40px'
+            height="40px"
             value={props.dataSellingForm.nominalDipakai1IDR2USD}
-            type='string'
+            type="string"
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Nominal
           </Text>
           <Input
-            name='nominal'
+            name="nominal"
             onChange={props.handleChangeDataFormSelling}
-            height='40px'
+            height="40px"
             value={props.dataSellingForm.nominal}
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Kurs
           </Text>
           <Input
-            name='kurs'
+            name="kurs"
             onChange={props.handleChangeDataFormSelling}
-            height='40px'
+            height="40px"
             value={props.dataSellingForm.kurs}
-            type='string'
+            type="string"
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Nominal Dollar
           </Text>
           <Input
-            name='nominalDollar'
+            name="nominalDollar"
             value={props.dataSellingForm.nominalDollar}
             onChange={props.handleChangeDataFormSelling}
-            type='text'
-            height='40px'
+            type="text"
+            height="40px"
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             QTY (Quantity)
           </Text>
           <Input
-            name='qty'
+            name="qty"
             onChange={props.handleChangeDataFormSelling}
-            height='40px'
+            height="40px"
             value={props.dataSellingForm.qty}
-            type='text'
+            type="text"
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Percentage
           </Text>
           <Input
-            name='percentage'
+            name="percentage"
             onChange={props.handleChangeDataFormSelling}
-            height='40px'
+            height="40px"
             value={props.dataSellingForm.percentage}
-            type='text'
+            type="text"
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Valued Added Tax
           </Text>
@@ -207,37 +207,37 @@ const FormSelling: React.FC<IProps> = (props) => {
             onChange={props.handleChangeValueAddedTaxSelling}
             value={props.dataSellingForm.valueAddedTax}
           >
-            <Stack direction='row'>
-              <Radio value='yes'>Yes</Radio>
-              <Radio value='no'>No</Radio>
+            <Stack direction="row">
+              <Radio value="yes">Yes</Radio>
+              <Radio value="no">No</Radio>
             </Stack>
           </RadioGroup>
         </Box>
       </Box>
-      <Flex justifyContent='flex-start' w='full' mt='10px' gridGap='15px'>
+      <Flex justifyContent="flex-start" w="full" mt="10px" gridGap="15px">
         <Button
-          minWidth='111px'
-          minHeight='51px'
-          width='150px'
-          height='35px'
-          bgColor='#71C087'
-          color='white'
-          borderRadius='8px'
+          minWidth="111px"
+          minHeight="51px"
+          width="150px"
+          height="35px"
+          bgColor="#71C087"
+          color="white"
+          borderRadius="8px"
           onClick={props.handleAddUpdateListDataSelling}
           disabled={isDisabledSubmit()}
           _hover={{}}
         >
-          {props.idEditFormSelling ? 'Update Data' : 'Add Data'}
+          {props.idEditFormSelling ? "Update Data" : "Add Data"}
         </Button>
         <Button
-          borderRadius='8px'
-          minWidth='111px'
-          minHeight='51px'
-          width='150px'
-          height='35px'
-          bgColor='#E2AA57'
-          color='white'
-          onClick={() => props.handleClearFormData('selling')}
+          borderRadius="8px"
+          minWidth="111px"
+          minHeight="51px"
+          width="150px"
+          height="35px"
+          bgColor="#E2AA57"
+          color="white"
+          onClick={() => props.handleClearFormData("selling")}
           _hover={{}}
         >
           Cancel

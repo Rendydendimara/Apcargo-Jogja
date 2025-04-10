@@ -1,17 +1,16 @@
-import { Box, Text } from '@chakra-ui/layout';
-import React from 'react';
-import { IDataBuying, IDataTabelBuying } from '../../../interface';
-import { RenderDetailTabelBuying } from '../RenderDetailTabelBuying';
-import TdTabelDetail from '../TdTabelDetail';
-import TdTabelDetailBuying from '../TdTabelDetailBuying';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
-import { muiTheme } from '../../../utils/mui';
+import { Box, Text } from "@chakra-ui/layout";
+import CssBaseline from "@mui/material/CssBaseline";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import { ThemeProvider } from "@mui/material/styles";
+import React from "react";
+import { IDataBuying, IDataTabelBuying } from "../../../interface";
+import { muiTheme } from "../../../utils/mui";
+import { RenderDetailTabelBuying } from "../RenderDetailTabelBuying";
+import TdTabelDetailBuying from "../TdTabelDetailBuying";
 interface IProps {
   listDataBuying: IDataBuying[];
   dataAktifBuy: any[];
@@ -29,37 +28,37 @@ const DataTabelBuying: React.FC<IProps> = (props) => {
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
       <Box
-        w='full'
-        borderWidth='2px'
-        borderColor='gray.400'
-        height='auto'
-        marginTop='30px'
+        w="full"
+        borderWidth="2px"
+        borderColor="gray.400"
+        height="auto"
+        marginTop="30px"
       >
-        <Box borderRadius='16px' h='600px' maxH='600px' overflowY='scroll'>
+        <Box borderRadius="16px" h="600px" maxH="600px" overflowY="scroll">
           <Table
             sx={{ minWidth: 750 }}
             stickyHeader
-            aria-label='sticky table'
-            size='small'
+            aria-label="sticky table"
+            size="small"
           >
             <TableHead>
               <TableRow>
                 <TableCell style={{ minWidth: 200 }}>
                   Fix Isi Jobsheet ID
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='right'>
+                <TableCell style={{ minWidth: 170 }} align="right">
                   Nominal Dipakai 1 IDR 2 USD
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='right'>
+                <TableCell style={{ minWidth: 170 }} align="right">
                   Nominal
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='right'>
+                <TableCell style={{ minWidth: 170 }} align="right">
                   Kurs
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='right'>
+                <TableCell style={{ minWidth: 170 }} align="right">
                   Nominal Dollar
                 </TableCell>
-                <TableCell style={{ minWidth: 170 }} align='center'>
+                <TableCell style={{ minWidth: 170 }} align="center">
                   Action
                 </TableCell>
               </TableRow>
@@ -69,7 +68,7 @@ const DataTabelBuying: React.FC<IProps> = (props) => {
                 (dataBuying: IDataBuying, index: number) => (
                   <TdTabelDetailBuying
                     haveAction={true}
-                    name={dataBuying.fixIsiJobsheetID?.label ?? ''}
+                    name={dataBuying.fixIsiJobsheetID?.label ?? ""}
                     total={String(dataBuying.nominalDipakai1IDR2USD)}
                     nominal={String(dataBuying.nominal)}
                     kurs={String(dataBuying.kurs)}
@@ -102,13 +101,13 @@ const DataTabelBuying: React.FC<IProps> = (props) => {
                 (data: IDataTabelBuying, index: number) => (
                   <>
                     <Text
-                      mt='10px'
-                      fontSize='13px'
-                      borderStyle='none'
-                      px='0px'
-                      fontWeight='bold'
-                      ml='4px'
-                      textTransform='capitalize'
+                      mt="10px"
+                      fontSize="13px"
+                      borderStyle="none"
+                      px="0px"
+                      fontWeight="bold"
+                      ml="4px"
+                      textTransform="capitalize"
                       key={index}
                     >
                       {data.label}

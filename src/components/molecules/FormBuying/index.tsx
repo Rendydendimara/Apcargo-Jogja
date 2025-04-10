@@ -1,15 +1,15 @@
-import { Button } from '@chakra-ui/button';
-import { Input } from '@chakra-ui/input';
-import { Box, Flex, Text } from '@chakra-ui/layout';
-import Select, { ActionMeta, OnChangeValue } from 'react-select';
-import React from 'react';
-import { IFormBuying, ISelectJobSheetID } from '../../../interface';
-import { colourStyles } from '../../../utils/select2';
+import { Button } from "@chakra-ui/button";
+import { Input } from "@chakra-ui/input";
+import { Box, Flex, Text } from "@chakra-ui/layout";
+import Select, { ActionMeta, OnChangeValue } from "react-select";
+import React from "react";
+import { IFormBuying, ISelectJobSheetID } from "../../../interface";
+import { colourStyles } from "../../../utils/select2";
 interface IProps {
   listSelectJobSheetID: ISelectJobSheetID[];
   dataBuyingForm: IFormBuying;
   idEditFormBuying: number | null;
-  handleClearFormData: (formName: 'buying' | 'selling') => void;
+  handleClearFormData: (formName: "buying" | "selling") => void;
   handleChangeDataFormBuying: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
@@ -42,127 +42,127 @@ const FormBuying: React.FC<IProps> = (props) => {
   return (
     <Box
       w={{
-        base: '100%',
-        sm: '100%',
-        md: '50%',
-        xl: '50%',
+        base: "100%",
+        sm: "100%",
+        md: "50%",
+        xl: "50%",
       }}
     >
-      <Text fontWeight='900' fontSize='20px' lineHeight='27px' color='#333333'>
+      <Text fontWeight="900" fontSize="20px" lineHeight="27px" color="#333333">
         Buying
       </Text>
-      <Box marginTop='39px' w='full'>
-        <Box w='full' marginBottom='20px'>
+      <Box marginTop="39px" w="full">
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Fix Isi Jobsheet ID
           </Text>
           <Select
             options={props.listSelectJobSheetID}
             onChange={props.handleChangeJobSheetIDBuying}
-            placeholder='Select jobsheet id'
+            placeholder="Select jobsheet id"
             styles={colourStyles}
             value={props.dataBuyingForm.fixIsiJobsheetID}
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Nominal Dipakai 1 IDR 2 USD
           </Text>
           <Input
-            name='nominalDipakai1IDR2USD'
+            name="nominalDipakai1IDR2USD"
             onChange={props.handleChangeDataFormBuying}
-            height='40px'
+            height="40px"
             value={props.dataBuyingForm.nominalDipakai1IDR2USD}
-            type='number'
+            type="number"
             max={2}
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Nominal
           </Text>
           <Input
-            name='nominal'
+            name="nominal"
             onChange={props.handleChangeDataFormBuying}
-            height='40px'
+            height="40px"
             value={props.dataBuyingForm.nominal}
-            type='string'
+            type="string"
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Kurs
           </Text>
           <Input
-            name='kurs'
+            name="kurs"
             onChange={props.handleChangeDataFormBuying}
-            height='40px'
+            height="40px"
             value={props.dataBuyingForm.kurs}
-            type='string'
+            type="string"
           />
         </Box>
-        <Box w='full' marginBottom='20px'>
+        <Box w="full" marginBottom="20px">
           <Text
-            color='#686868'
-            fontSize='14px'
-            lineHeight='19px'
-            marginBottom='15px'
+            color="#686868"
+            fontSize="14px"
+            lineHeight="19px"
+            marginBottom="15px"
           >
             Nominal Dollar
           </Text>
           <Input
-            name='nominalDollar'
+            name="nominalDollar"
             onChange={props.handleChangeDataFormBuying}
-            height='40px'
+            height="40px"
             value={props.dataBuyingForm.nominalDollar}
-            type='text'
+            type="text"
           />
         </Box>
       </Box>
-      <Flex justifyContent='flex-start' w='full' mt='10px' gridGap='15px'>
+      <Flex justifyContent="flex-start" w="full" mt="10px" gridGap="15px">
         <Button
-          minWidth='111px'
-          minHeight='51px'
-          width='150px'
-          height='35px'
-          bgColor='#71C087'
-          color='white'
-          borderRadius='8px'
+          minWidth="111px"
+          minHeight="51px"
+          width="150px"
+          height="35px"
+          bgColor="#71C087"
+          color="white"
+          borderRadius="8px"
           onClick={props.handleAddUpdateListDataBuying}
           disabled={isDisabledSubmit()}
           _hover={{}}
         >
-          {props.idEditFormBuying ? 'Update Data' : 'Add Data'}
+          {props.idEditFormBuying ? "Update Data" : "Add Data"}
         </Button>
         <Button
-          borderRadius='8px'
-          minWidth='111px'
-          minHeight='51px'
-          width='150px'
-          height='35px'
-          bgColor='#E2AA57'
-          color='white'
-          onClick={() => props.handleClearFormData('buying')}
+          borderRadius="8px"
+          minWidth="111px"
+          minHeight="51px"
+          width="150px"
+          height="35px"
+          bgColor="#E2AA57"
+          color="white"
+          onClick={() => props.handleClearFormData("buying")}
           _hover={{}}
         >
           Cancel
